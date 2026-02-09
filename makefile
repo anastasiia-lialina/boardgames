@@ -1,46 +1,49 @@
-# Запустить проект
-up:
+# Переменная по умолчанию для помощи
+.DEFAULT_GOAL := help
+
+# Список всех "ложных" целей (не файлов)
+.PHONY: help up down restart sh composer update migrate migrate-create migrate-down-all migrate-down perms logs logs-php db
+
+help: ## Помощь
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+up: ## Запустить проект в фоне
 	docker compose up -d
 
-# Остановить проект
-down:
+down: ## Остановить проект
 	docker compose down
 
-# Перезапустить
-restart: down up
+restart: down up ## Перезапустить
 
-# Войти в контейнер PHP
-sh:
+sh: ## Войти в контейнер PHP
 	docker compose exec php sh
 
-# Установить зависимости
-composer:
+composer: ## Установить зависимости
 	docker compose exec php composer install --ignore-platform-reqs
 
-# Обновить зависимости
-update:
+update: ## Обновить зависимости
 	docker compose exec php composer update --ignore-platform-reqs
 
-# Миграции
-migrate:
+migrate: ## Применить миграции
 	docker compose exec php php yii migrate/up --interactive=0
 
-# Создать миграцию
-create-migration:
-	docker compose exec php php yii migrate/create
+migrate-create: ## Создать миграцию
+	docker compose exec php php yii migrate/create $(name)
 
-# Исправить права
-perms:
+migrate-down-all: ## Откат всех миграций
+	docker compose exec php php yii migrate/down all
+
+migrate-down: ## Откат n последних миграций
+	docker compose exec php php yii migrate/down ${n}
+
+perms: ## Исправить права
 	docker compose exec php sh -c "chown -R www-data:www-data runtime web/assets && chmod -R 755 runtime web/assets"
 
-# Логи
-logs:
+logs: ## Логи
 	docker compose logs -f
 
-# Логи только ошибок PHP
-logs-php:
+logs-php: ## Логи только ошибок PHP
 	docker compose logs -f php
 
-# Войти в БД
-db:
+db: ## Войти в БД
 	docker compose exec postgres psql -U boardgame_user -d boardgame
