@@ -1,0 +1,38 @@
+# Yii2
+/runtime/*
+!/runtime/.gitkeep
+/web/assets/*
+!/web/assets/.gitkeep
+/vendor/
+.env
+.env.local
+.env.*.local
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+.DS_Store
+Thumbs.db
+
+# Composer
+composer.phar
+
+/tests/
+
+# OS specific
+*.orig
+*.bak
+*~
+
+# Database
+*.sql
