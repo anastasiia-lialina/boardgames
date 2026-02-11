@@ -18,10 +18,16 @@ restart: down up ## Перезапустить
 sh: ## Войти в контейнер PHP
 	docker compose exec php sh
 
-composer: ## Установить зависимости
+composer-install: ## Установить зависимости
 	docker compose exec php composer install --ignore-platform-reqs
 
-update: ## Обновить зависимости
+composer-require: ##   Требовать зависимость
+	docker compose exec php composer require --prefer-dist ${lib}
+
+composer-remove: ##   Удалить зависимость
+	docker compose exec php composer remove ${lib}
+
+composer-update: ## Обновить зависимости
 	docker compose exec php composer update --ignore-platform-reqs
 
 migrate: ## Применить миграции
@@ -47,3 +53,6 @@ logs-php: ## Логи только ошибок PHP
 
 db: ## Войти в БД
 	docker compose exec postgres psql -U boardgame_user -d boardgame
+
+cache-clear: ##  Очистить кэш
+	docker compose exec php php yii cache/flush-all

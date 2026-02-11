@@ -3,16 +3,16 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `{{%game}}`.
+ * Handles the creation of table `{{%games}}`.
  */
-class m260209_103342_create_game_table extends Migration
+class m260209_103342_create_games_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp(): void
     {
-        $this->createTable('{{%game}}', [
+        $this->createTable('{{%games}}', [
             'id' => $this->primaryKey(),
             'title' => $this->string(200)->notNull()->comment('Название'),
             'description' => $this->text()->comment('Описание'),
@@ -23,11 +23,11 @@ class m260209_103342_create_game_table extends Migration
             'year' => $this->integer()->notNull()->comment('Год выпуска'),
             'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Дата добавления'),
         ]);
-        $this->addCommentOnTable('{{%game}}','Настольные игры');
+        $this->addCommentOnTable('{{%games}}','Настольные игры');
 
-        $this->createIndex('idx_game_players', '{{%game}}', ['players_min', 'players_max']);
-        $this->createIndex('idx_game_complexity', '{{%game}}', 'complexity');
-        $this->createIndex('idx_game_year', '{{%game}}', 'year');
+        $this->createIndex('idx_games_players', '{{%games}}', ['players_min', 'players_max']);
+        $this->createIndex('idx_games_complexity', '{{%games}}', 'complexity');
+        $this->createIndex('idx_games_year', '{{%games}}', 'year');
     }
 
     /**
@@ -35,9 +35,9 @@ class m260209_103342_create_game_table extends Migration
      */
     public function safeDown(): void
     {
-        $this->dropIndex('idx_game_players', '{{%game}}');
-        $this->dropIndex('idx_game_complexity', '{{%game}}');
-        $this->dropIndex('idx_game_year', '{{%game}}');
-        $this->dropTable('{{%game}}');
+        $this->dropIndex('idx_games_players', '{{%games}}');
+        $this->dropIndex('idx_games_complexity', '{{%games}}');
+        $this->dropIndex('idx_games_year', '{{%games}}');
+        $this->dropTable('{{%games}}');
     }
 }
