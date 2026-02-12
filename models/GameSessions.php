@@ -42,7 +42,7 @@ class GameSessions extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules(): array
+    public function rules()
     {
         return [
             [['game_id', 'organizer_id', 'scheduled_at', 'max_participants'], 'required'],
@@ -73,12 +73,12 @@ class GameSessions extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'game_id' => Yii::t('app', 'Игра'),
-            'organizer_id' => Yii::t('app', 'Организатор'),
-            'scheduled_at' => Yii::t('app', 'Дата и время'),
-            'max_participants' => Yii::t('app', 'Макс. участников'),
-            'status' => Yii::t('app', 'Статус'),
-            'created_at' => Yii::t('app', 'Создан'),
+            'game_id' => Yii::t('app', 'Game'),
+            'organizer_id' => Yii::t('app', 'Organizer'),
+            'scheduled_at' => Yii::t('app', 'Scheduled At'),
+            'max_participants' => Yii::t('app', 'Max Participants'),
+            'status' => Yii::t('app', 'Status'),
+            'created_at' => Yii::t('app', 'Created At'),
         ];
     }
 

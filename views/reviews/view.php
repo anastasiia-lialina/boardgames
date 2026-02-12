@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /** @var app\models\Reviews $model */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Reviews'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Review Moderation'), 'url' => ['admin/index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'rating',
             'comment:ntext',
             'is_approved:boolean',
-            'created_at',
+            'created_at:datetime',
         ],
     ]) ?>
 

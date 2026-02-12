@@ -73,7 +73,7 @@ class ReviewsController extends Controller
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
                 $model->user_id = Yii::$app->user->id;
-
+var_dump($model->getErrors());exit;
                 if ($model->save()) {
                     Yii::$app->session->setFlash('success', Yii::t('app', 'Отзыв отправлен на модерацию!'));
                     return $this->redirect(['game/view', 'id' => $model->game_id]);

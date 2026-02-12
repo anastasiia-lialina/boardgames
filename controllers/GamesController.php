@@ -69,7 +69,6 @@ class GamesController extends Controller
 
         if ($reviewForm->load(Yii::$app->request->post())) {
             $reviewForm->user_id = Yii::$app->user->id;
-
             if ($reviewForm->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app','Отзыв отправлен на модерацию!'));
                 $this->refresh();

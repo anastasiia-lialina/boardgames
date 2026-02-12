@@ -35,12 +35,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'description:ntext',
             'players_min',
             'players_max',
-            //'duration_min',
-            //'complexity',
-            //'year',
-            //'created_at',
+            'duration_min',
+            'complexity',
+            'year',
+            'created_at',
             [
-                'class' => ActionColumn::className(),
+                'class' => ActionColumn::class,
                 'urlCreator' => function ($action, Games $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }

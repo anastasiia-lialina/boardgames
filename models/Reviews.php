@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -44,16 +45,21 @@ class Reviews extends ActiveRecord
                 'updatedAtAttribute' => false,
                 'value' => new Expression('NOW()'),
             ],
+            [
+                'class' => BlameableBehavior::class,
+                'updatedByAttribute' => false,
+                'createdByAttribute' => 'user_id',
+            ]
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules(): array
+    public function rules()
     {
         return [
-            [['game_id', 'user_id', 'rating'], 'required'],
+            [['game_id', 'rating'], 'required'],
 
             [['game_id', 'user_id', 'rating'], 'integer'],
 
@@ -68,7 +74,7 @@ class Reviews extends ActiveRecord
                 ['user_id', 'game_id'],
                 'unique',
                 'targetAttribute' => ['user_id', 'game_id'],
-                'message' => Yii::t('app', 'Вы уже оставляли отзыв к этой игре.')
+                'message' => Yii::t('app', 'You have already left a review for this game.')
             ],
 
             [['game_id'], 'exist', 'skipOnError' => true, 'targetClass' => Games::class, 'targetAttribute' => ['game_id' => 'id']],
@@ -82,12 +88,12 @@ class Reviews extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'game_id' => Yii::t('app', 'Игра'),
-            'user_id' => Yii::t('app', 'Пльзователь'),
-            'rating' => Yii::t('app', 'Рейтинг'),
-            'comment' => Yii::t('app', 'Комментарий'),
-            'is_approved' => Yii::t('app', 'Одобрен'),
-            'created_at' => Yii::t('app', 'Дата'),
+            'game_id' => Yii::t('app', 'Game'),
+            'user_id' => Yii::t('app', 'User'),
+            'rating' => Yii::t('app', 'Rating'),
+            'comment' => Yii::t('app', 'Comment'),
+            'is_approved' => Yii::t('app', 'Is Approved'),
+            'created_at' => Yii::t('app', 'Created At'),
         ];
     }
 
@@ -109,26 +115,4 @@ class Reviews extends ActiveRecord
     {
         return new ReviewsQuery(get_called_class());
     }
-
-    public function beforeSave($insert)
-    {
-        if (!parent::beforeSave($insert)) {
-            return false;
-        }
-
-        // Если это новая запись, проверяем на дубликат
-        if ($insert) {
-            $existing = Review::find()
-                ->where(['user_id' => $this->user_id, 'game_id' => $this->game_id])
-                ->exists();
-
-            if ($existing) {
-                $this->addError('user_id', Yii::t('app', 'Вы уже оставляли отзыв к этой игре.'));
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 }

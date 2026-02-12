@@ -33,11 +33,7 @@ class Games extends ActiveRecord
     const MIN_COMPLEXITY = 1.0;
     const MAX_COMPLEXITY = 5.0;
     const MIN_YEAR = 1900;
-
-    public Reviews|null $approvedReviews = null;
     public GameSessions|null $upcomingSessions = null;
-    public int $averageRating = 0;
-    public int $reviewsCount = 0;
 
     /**
      * {@inheritdoc}
@@ -91,14 +87,14 @@ class Games extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'title' => Yii::t('app', 'Название'),
-            'description' => Yii::t('app', 'Описание'),
-            'players_min' => Yii::t('app', 'Мин.игроков'),
-            'players_max' => Yii::t('app', 'Макс. игроков'),
-            'duration_min' => Yii::t('app', 'Время игры(мин.)'),
-            'complexity' => Yii::t('app', 'Сложность'),
-            'year' => Yii::t('app', 'Год выпуска'),
-            'created_at' => Yii::t('app', 'Дата'),
+            'title' => Yii::t('app', 'Title'),
+            'description' => Yii::t('app', 'Description'),
+            'players_min' => Yii::t('app', 'Min. players'),
+            'players_max' => Yii::t('app', 'Max. players'),
+            'duration_min' => Yii::t('app', 'Duration (min.)'),
+            'complexity' => Yii::t('app', 'Complexity'),
+            'year' => Yii::t('app', 'Year'),
+            'created_at' => Yii::t('app', 'Created At'),
         ];
     }
 
@@ -117,7 +113,7 @@ class Games extends ActiveRecord
     /**
      * Получить количество одобренных отзывов
      */
-    public function getReviewsCount(): bool|int|string|null
+    public function getReviewsCount(): int
     {
         return Reviews::find()
             ->where(['game_id' => $this->id, 'is_approved' => true])
@@ -127,11 +123,19 @@ class Games extends ActiveRecord
     /**
      * Получить все одобренные отзывы
      */
-    public function getReviews(): ActiveQuery
+    public function getApprovedReviews(): ActiveQuery
     {
         return $this->hasMany(Reviews::class, ['game_id' => 'id'])
             ->where(['is_approved' => true])
             ->orderBy(['created_at' => SORT_DESC]);
+    }
+
+    /**
+     * Получить все отзывы
+     */
+    public function getReviews(): ActiveQuery
+    {
+        return $this->hasMany(Reviews::class, ['game_id' => 'id']);
     }
 
     /**

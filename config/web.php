@@ -9,11 +9,16 @@ $config = [
     'bootstrap' => ['log'],
     'defaultRoute' => 'games/index',
     'name' => 'BoardGames',
+    'language' => 'ru-RU',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
     'components' => [
+        'formatter' => [
+            'dateFormat' => 'dd.MM.yyyy',
+            'datetimeFormat' => 'dd.MM.yyyy HH:mm',
+        ],
         'request' => [
             'cookieValidationKey' => getenv('APP_KEY') ?: 'your-secret-key-here',
             'baseUrl' => '',
@@ -58,6 +63,18 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 // Ваши правила маршрутизации
+            ],
+        ],
+        'i18n' => [
+            'translations' => [
+                'app*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en-US',
+                    'fileMap' => [
+                        'app'       => 'app.php',
+                    ],
+                ],
             ],
         ],
     ],

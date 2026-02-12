@@ -17,12 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Create Reviews'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
     <?php Pjax::begin(); ?>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -35,10 +30,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'user_id',
             'rating',
             'comment:ntext',
-            //'is_approved:boolean',
-            //'created_at',
+            'is_approved:boolean',
+            'created_at:datetime',
             [
-                'class' => ActionColumn::className(),
+                'class' => ActionColumn::class,
                 'urlCreator' => function ($action, Reviews $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
