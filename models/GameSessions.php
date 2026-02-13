@@ -6,6 +6,7 @@ use DateTime;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "game_sessions".
@@ -18,7 +19,7 @@ use yii\db\ActiveRecord;
  * @property string $status Статус сессии
  * @property string $created_at Дата добавления
  *
- * @property Games $games
+ * @property Games $game
  */
 class GameSessions extends ActiveRecord
 {
@@ -60,7 +61,9 @@ class GameSessions extends ActiveRecord
                 self::STATUS_CANCELLED
             ]],
 
-            ['scheduled_at', 'validateFutureDate'],
+            ['status', 'validateStatus'],
+
+            ['scheduled_at', 'validateScheduledAt'],
 
             [['game_id'], 'exist', 'skipOnError' => true, 'targetClass' => Games::class, 'targetAttribute' => ['game_id' => 'id']],
         ];
@@ -83,19 +86,63 @@ class GameSessions extends ActiveRecord
     }
 
     /**
-     * Дата должна быть в будущем
-     * @throws \DateMalformedStringException
+     * Валидация статуса: при создании только 'planned'
      */
-    public function validateFutureDate($attribute): void
+    public function validateStatus($attribute)
     {
-        $scheduled = new DateTime($this->$attribute);
-        $now = new DateTime();
+        if ($this->isNewRecord) {
+            $this->status = self::STATUS_PLANNED;
+        } else {
+            // проверяем допустимые значения
+            $allowedStatuses = [
+                self::STATUS_PLANNED,
+                self::STATUS_ACTIVE,
+                self::STATUS_COMPLETED,
+                self::STATUS_CANCELLED
+            ];
 
-        if ($scheduled < $now) {
-            $this->addError(
-                $attribute,
-                Yii::t('app','Дата проведения не может быть в прошлом.')
-            );
+            if (!in_array($this->status, $allowedStatuses)) {
+                $this->addError($attribute, Yii::t('app', 'Invalid status.'));
+            }
+        }
+    }
+
+    /**
+     * Валидация даты в зависимости от статуса
+     */
+    public function validateScheduledAt($attribute)
+    {
+        if (!$this->scheduled_at) {
+            return;
+        }
+        $scheduled = new \DateTime($this->scheduled_at);
+        $now = new \DateTime();
+
+        switch ($this->status) {
+            case self::STATUS_PLANNED:
+                // Запланированная сессия
+                if ($scheduled <= $now) {
+                    $this->addError($attribute, Yii::t('app', 'The scheduled date must be in the future.'));
+                }
+                break;
+
+            case self::STATUS_ACTIVE:
+                // сессия уже началась
+                if ($scheduled > $now) {
+                    $this->addError($attribute, Yii::t('app', 'An active session must have already started.'));
+                }
+                break;
+
+            case self::STATUS_COMPLETED:
+                // сессия уже закончилась
+                if ($scheduled >= $now) {
+                    $this->addError($attribute, Yii::t('app', 'A completed session must be in the past.'));
+                }
+                break;
+
+            case self::STATUS_CANCELLED:
+                // дата может быть любой
+                break;
         }
     }
 
@@ -104,7 +151,7 @@ class GameSessions extends ActiveRecord
      *
      * @return ActiveQuery|GamesQuery
      */
-    public function getGames(): ActiveQuery|GamesQuery
+    public function getGame(): ActiveQuery|GamesQuery
     {
         return $this->hasOne(Games::class, ['id' => 'game_id']);
     }
@@ -119,17 +166,6 @@ class GameSessions extends ActiveRecord
     }
 
     /**
-     * Получить предстоящие сессии
-     */
-    public static function findUpcoming(): GameSessionsQuery
-    {
-        return static::find()
-            ->where(['>=', 'scheduled_at', new \DateTime()])
-            ->andWhere(['status' => GameSessions::STATUS_PLANNED])
-            ->orderBy(['scheduled_at' => SORT_ASC]);
-    }
-
-    /**
      * Получить все сессии по статусу
      */
     public static function findByStatus($status): GameSessionsQuery
@@ -138,4 +174,34 @@ class GameSessions extends ActiveRecord
             ->where(['status' => $status])
             ->orderBy(['scheduled_at' => SORT_DESC]);
     }
+
+    public function getStatusLabels(): array
+    {
+        return [
+            self::STATUS_PLANNED => Yii::t('app', 'Planned'),
+            self::STATUS_ACTIVE => Yii::t('app', 'Active'),
+            self::STATUS_COMPLETED => Yii::t('app', 'Completed'),
+            self::STATUS_CANCELLED => Yii::t('app', 'Cancelled'),
+        ];
+    }
+
+    public function getStatusLabel()
+    {
+        return ArrayHelper::getValue($this->getStatusLabels(), $this->status);
+    }
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->scheduled_at) {
+                $date = DateTime::createFromFormat('d.m.Y H:i', $this->scheduled_at);
+                if ($date) {
+                    $this->scheduled_at = $date->format('Y-m-d H:i:s');
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

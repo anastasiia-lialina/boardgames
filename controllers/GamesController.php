@@ -5,6 +5,9 @@ namespace app\controllers;
 use app\models\Games;
 use app\models\Reviews;
 use app\models\SearchGames;
+use app\models\SearchGameSessions;
+use app\models\SearchReviews;
+use app\models\SearchUpcomingSessions;
 use Yii;
 use yii\db\Exception;
 use yii\web\Controller;
@@ -61,8 +64,11 @@ class GamesController extends Controller
     {
         $model = $this->findModel($id);
 
-        $reviews = $model->approvedReviews;
-        $upcomingSessions = $model->upcomingSessions;
+        $reviewSearch = new SearchReviews();
+        $reviewsDataProvider = $reviewSearch->getApprovedReviewsForGame($id);
+
+        $sessionSearch = new SearchGameSessions();
+        $sessionsDataProvider = $sessionSearch->getUpcomingSessionsForGame($id);
 
         $reviewForm = new Reviews();
         $reviewForm->game_id = $id;
@@ -77,8 +83,8 @@ class GamesController extends Controller
 
         return $this->render('view', [
             'model' => $model,
-            'reviews' => $reviews,
-            'upcomingSessions' => $upcomingSessions,
+            'reviewsDataProvider' => $reviewsDataProvider,
+            'sessionsDataProvider' => $sessionsDataProvider,
             'reviewForm' => $reviewForm,
         ]);
     }

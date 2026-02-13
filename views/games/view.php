@@ -2,11 +2,13 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap5\ActiveForm;
+use yii\widgets\ListView;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Games */
-/* @var $reviews app\models\Reviews[] */
-/* @var $upcomingSessions app\models\GameSessions[] */
+/* @var $reviewsDataProvider \app\models\SearchReviews */
+/* @var $sessionsDataProvider \app\models\SearchGameSessions */
 /* @var $reviewForm app\models\Reviews */
 
 $this->title = $model->title;
@@ -50,7 +52,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     [
                             'attribute' => 'complexity',
-                            'label' => Yii::t('app', 'Complexity'),
                             'value' => $model->complexity . '/5',
                     ],
                     'year',
@@ -65,49 +66,43 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
     ]) ?>
 
-    <h2><?= Yii::t('app', 'Upcoming Sessions') ?></h2>
-    <?php if ($upcomingSessions): ?>
-        <div class="list-group">
-            <?php foreach ($upcomingSessions as $session): ?>
-                <div class="list-group-item">
-                    <h5><?= Yii::$app->formatter->asDatetime($session->scheduled_at) ?></h5>
-                    <p><?= Yii::t('app', 'Max Participants') ?>: <?= $session->max_participants ?></p>
-                    <p><?= Yii::t('app', 'Status') ?>: <?= $session->statusLabel ?></p>
-                </div>
-            <?php endforeach; ?>
-        </div>
+
+    <!-- Предстоящие сессии -->
+    <h2><?= Yii::t('app', 'Upcoming Sessions')?></h2>
+    <?php if ($sessionsDataProvider->totalCount > 0): ?>
+        <?php Pjax::begin(['id' => 'sessions-pjax']); ?>
+
+        <?= ListView::widget([
+                'dataProvider' => $sessionsDataProvider,
+                'itemView' => '_session_item',
+                'layout' => "{items}\n{pager}",
+                'options' => ['class' => 'list-view sessions-list'],
+        ]) ?>
+
+        <?php Pjax::end(); ?>
     <?php else: ?>
-        <p class="text-muted"><?= Yii::t('app', 'No sessions scheduled.') ?></p>
+        <p class="text-muted"><?= Yii::t('app', 'No sessions scheduled.')?></p>
     <?php endif; ?>
 
-    <h2>
-        <?= Yii::t('app', 'Reviews') ?>
-        (<?= Yii::t('app', '{n, plural, =0{No reviews} one{# review} few{# reviews} many{# reviews} other{# reviews}}', ['n' => $model->reviewsCount]); ?>)
-    </h2>
+    <!-- Отзывы -->
+    <h2>Отзывы (<?= $model->reviewsCount ?>)</h2>
+    <?php if ($reviewsDataProvider->totalCount > 0): ?>
+        <?php Pjax::begin(['id' => 'reviews-pjax']); ?>
 
-    <?php if ($reviews): ?>
-        <div class="reviews-list">
-            <?php foreach ($reviews as $review): ?>
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-body">
-                        <h4>
-                            <?= str_repeat('⭐', $review->rating) ?>
-                            <small class="text-muted">(<?= $review->rating ?>/5)</small>
-                        </h4>
-                        <?php if ($review->comment): ?>
-                            <p class="card-text"><?= nl2br(Html::encode($review->comment)) ?></p>
-                        <?php endif; ?>
-                        <footer class="blockquote-footer mt-2">
-                            <?= Yii::t('app', 'By: User #{id}', ['id' => $review->user_id]) ?> |
-                            <?= Yii::$app->formatter->asDatetime($review->created_at) ?>
-                        </footer>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
+        <?= ListView::widget([
+                'dataProvider' => $reviewsDataProvider,
+                'itemView' => '_review_item',
+                'layout' => "{summary}\n{items}\n{pager}",
+                'options' => ['class' => 'list-view reviews-list'],
+        ]) ?>
+
+        <?php Pjax::end(); ?>
     <?php else: ?>
-        <p class="text-muted"><?= Yii::t('app', 'No reviews yet.') ?></p>
+        <p class="text-muted">Нет отзывов.</p>
     <?php endif; ?>
+
+
+
 
     <?php if (!Yii::$app->user->isGuest): ?>
         <div class="review-form mt-4 bg-light p-3 rounded">

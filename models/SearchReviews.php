@@ -72,4 +72,30 @@ class SearchReviews extends Reviews
 
         return $dataProvider;
     }
+
+    /**
+     * Получить одобренные отзывы для конкретной игры
+     *
+     * @param int $gameId
+     * @param int $pageSize
+     * @return ActiveDataProvider
+     */
+    public function getApprovedReviewsForGame($gameId, $pageSize = 2)
+    {
+        $query = self::find()
+            ->where(['game_id' => $gameId, 'is_approved' => true])
+            ->orderBy(['created_at' => SORT_DESC]);
+
+        return new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => $pageSize,
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC,
+                ],
+            ],
+        ]);
+    }
 }

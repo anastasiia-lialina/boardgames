@@ -5,6 +5,7 @@ namespace app\models;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -33,7 +34,6 @@ class Games extends ActiveRecord
     const MIN_COMPLEXITY = 1.0;
     const MAX_COMPLEXITY = 5.0;
     const MIN_YEAR = 1900;
-    public GameSessions|null $upcomingSessions = null;
 
     /**
      * {@inheritdoc}
@@ -149,12 +149,30 @@ class Games extends ActiveRecord
     /**
      * Получить предстоящие сессии
      */
-    public function getUpcomingSessions()
+    public function getUpcomingSessions(): ActiveQuery
     {
         return $this->hasMany(GameSessions::class, ['game_id' => 'id'])
-            ->where(['>=', 'scheduled_at', new DateTime()])
+            ->where(['>=', 'scheduled_at', date('Y-m-d H:i:s')])
             ->andWhere(['status' => GameSessions::STATUS_PLANNED])
             ->orderBy(['scheduled_at' => SORT_ASC]);
+    }
+
+    /**
+    * Получить список одобренных отзывов отсортированный и с пагинацией
+    */
+    public function getReviewsDataProvider($pageSize = 2): ActiveDataProvider
+    {
+        return new ActiveDataProvider([
+            'query' => $this->getApprovedReviews(),
+            'pagination' => [
+                'pageSize' => $pageSize,
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC,
+                ],
+            ],
+        ]);
     }
 
     /**
