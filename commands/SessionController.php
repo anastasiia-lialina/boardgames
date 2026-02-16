@@ -5,58 +5,46 @@ namespace app\commands;
 use yii\console\Controller;
 use app\models\GameSessions;
 use Yii;
+use yii\console\ExitCode;
 use yii\helpers\Console;
 
 /**
- * Session controller for managing game sessions
+ * Управление игровыми сессиями
  */
 class SessionController extends Controller
 {
     /**
-     * Обновить статусы прошедших сессий
-     * Крон каждый час:
-     *    0 * * * * /path/to/php yii session/update-status
-     *
+     * Отмена просроченных запланированных сессий (которые должны были начаться до сегодняшнего для)
      */
     public function actionUpdateStatus(): int
     {
-        $count = GameSessions::updateExpiredSessions();
+        try {
+            $count = GameSessions::updateExpiredSessions();
 
-        if ($count > 0) {
-            $this->stdout("Обновлено статусов сессий: $count\n", Console::FG_GREEN);
-            Yii::info("Updated $count session statuses", 'application');
-        } else {
-            $this->stdout("Нет сессий для обновления\n", Console::FG_YELLOW);
+            if ($count > 0) {
+                $this->stdout("Успешно отменено просроченных сессий: $count\n", Console::FG_GREEN);
+            } else {
+                $this->stdout("Нет просроченных сессий для отмены\n", Console::FG_YELLOW);
+            }
+        } catch (\Exception $e) {
+            $this->stderr("Ошибка при выполнении: " . $e->getMessage() . "\n", Console::FG_RED);
+            return ExitCode::UNSPECIFIED_ERROR;
         }
-
-        return 0;
+        return ExitCode::OK;
     }
 
     /**
-     * Показать сессии с устаревшим статусом (для отладки)
-     * @return void
+     * Просмотр сессий, которые подлежат отмене (для отладки)
      */
     public function actionCheckStale(): void
     {
-        $now = date('Y-m-d H:i:s');
+        $count = GameSessions::findStalePlannedCount();
 
-        // Запланированные сессии, которые уже должны были начаться
-        $stalePlanned = GameSessions::find()
-            ->where(['status' => GameSessions::STATUS_PLANNED])
-            ->andWhere(['<=', 'scheduled_at', $now])
-            ->count();
-
-        // Активные сессии, которые уже должны были завершиться
-        $staleActive = GameSessions::find()
-            ->where(['status' => GameSessions::STATUS_ACTIVE])
-            ->andWhere(['<', 'scheduled_at', $now])
-            ->count();
-
-        $this->stdout("Сессии со статусом 'Запланировано', но дата уже наступила: $stalePlanned\n");
-        $this->stdout("Сессии со статусом 'Активно', но дата уже прошла: $staleActive\n");
-
-        if ($stalePlanned + $staleActive > 0) {
-            $this->stdout("\nЗапустите: php yii session/update-status\n", Console::FG_GREEN);
+        if ($count > 0) {
+            $this->stdout("Найдено просроченных сессий: $count\n", Console::FG_CYAN);
+            $this->stdout("Запустите: php yii session/update-status\n", Console::FG_YELLOW);
+        } else {
+            $this->stdout("Просроченных сессий нет.\n", Console::FG_GREEN);
         }
     }
 }

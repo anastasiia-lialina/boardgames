@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\behaviors\StatusLogBehavior;
 use DateTime;
 use Yii;
 use yii\db\ActiveQuery;
@@ -84,6 +85,13 @@ class GameSessions extends ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'organizerUsername' => Yii::t('app', 'Organizer'),
             'gameTitle' => Yii::t('app', 'Game'),
+        ];
+    }
+
+    public function behaviors()
+    {
+        return [
+            StatusLogBehavior::class,
         ];
     }
 
@@ -212,39 +220,59 @@ class GameSessions extends ActiveRecord
     }
 
     /**
-     * Обновить статусы прошедших сессий
-     *
-     * - Запланированные сессии с прошедшей датой превращаем в активные
-     * - Активные сессии с прошедшей датой превращаем в завершённые
+     * Условие для поиска просроченных сессий
+     */
+    private static function getStaleCondition(): array
+    {
+        return [
+            'and',
+            ['status' => self::STATUS_PLANNED],
+            ['<', 'scheduled_at', date('Y-m-d 00:00:00')]
+        ];
+    }
+
+    /**
+     * Поиск количества просроченных сессий
+     */
+    public static function findStalePlannedCount(): int
+    {
+        return (int) self::find()->where(self::getStaleCondition())->count();
+    }
+
+    /**
+     * Отменяет запланированные сессии, которые должны были начаться до сегодняшнего дня
      *
      * @return int Количество обновлённых записей
      */
     public static function updateExpiredSessions(): int
     {
+        $db = self::getDb();
+        $condition = self::getStaleCondition();
         $now = date('Y-m-d H:i:s');
-        $count = 0;
 
-        // Запланированные сессии делаем активными
-        $count += static::updateAll(
-            ['status' => self::STATUS_ACTIVE],
-            [
-                'and',
-                ['<=', 'scheduled_at', $now],
-                ['status' => self::STATUS_PLANNED],
-            ]
-        );
 
-        // Активные сессии, у которых дата уже прошла делаем завершёнными
-        $count += static::updateAll(
-            ['status' => self::STATUS_COMPLETED],
-            [
-                'and',
-                ['<', 'scheduled_at', $now],
-                ['status' => self::STATUS_ACTIVE],
-            ]
-        );
+        return $db->transaction(function ($db) use ($condition, $now) {
 
-        return $count;
+            // Берем данные для вставки в лог
+            $dataToLog = (new \yii\db\Query())
+                ->select([
+                    'session_id' => 'id',              // берем ID из game_session
+                    'old_status' => 'status',          // берем текущий статус
+                    'new_status' => new \yii\db\Expression(':new', [':new' => self::STATUS_CANCELLED]),
+                    'changed_at' => new \yii\db\Expression(':time', [':time' => $now]),
+                ])
+                ->from(self::tableName())
+                ->where($condition);
+
+            // Копируем данные о сессии в лог
+            $db->createCommand()
+                ->insert('game_session_log', $dataToLog)
+                ->execute();
+
+            // Обновляем записи сессии
+            return $db->createCommand()
+                ->update(self::tableName(), ['status' => self::STATUS_CANCELLED], $condition)
+                ->execute();
+        });
     }
-
 }
