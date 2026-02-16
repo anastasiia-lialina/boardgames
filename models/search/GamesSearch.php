@@ -1,14 +1,15 @@
 <?php
 
-namespace app\models;
+namespace app\models\search;
 
+use app\models\game\Games;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * SearchGame represents the model behind the search form of `app\models\Game`.
+ * SearchGame represents the model behind the search form of `app\models\game\Game`.
  */
-class SearchGames extends Games
+class GamesSearch extends Games
 {
     /**
      * {@inheritdoc}

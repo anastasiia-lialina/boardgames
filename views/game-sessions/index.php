@@ -1,12 +1,12 @@
 <?php
 
-use yii\helpers\Html;
+use app\models\game\GameSessions;
 use yii\grid\GridView;
+use yii\helpers\Html;
 use yii\widgets\Pjax;
-use app\models\GameSessions;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\SearchGameSessions */
+/* @var $searchModel \app\models\search\GameSessionsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Game Sessions');

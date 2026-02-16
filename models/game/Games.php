@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\game;
 
 use DateTime;
 use Yii;
@@ -176,14 +176,4 @@ class Games extends ActiveRecord
             ],
         ]);
     }
-
-    /**
-     * {@inheritdoc}
-     * @return GamesQuery the active query used by this AR class.
-     */
-    public static function find(): GamesQuery
-    {
-        return new GamesQuery(get_called_class());
-    }
-
 }

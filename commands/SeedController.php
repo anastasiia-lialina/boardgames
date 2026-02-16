@@ -2,13 +2,12 @@
 
 namespace app\commands;
 
+use app\models\game\GameSessions;
+use app\models\game\Games;
+use app\models\user\Reviews;
+use app\models\user\User;
 use Yii;
 use yii\console\Controller;
-use app\models\Games;
-use app\models\Reviews;
-use app\models\GameSessions;
-use app\models\User;
-use yii\db\Expression;
 
 /**
  * Controller для генерации тестовых данных

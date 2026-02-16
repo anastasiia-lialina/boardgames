@@ -2,13 +2,13 @@
 
 namespace app\controllers;
 
+use app\models\game\GameSessions;
+use app\models\search\SearchGameSessions;
 use Yii;
-use app\models\GameSessions;
-use app\models\SearchGameSessions;
 use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * GameSessionController implements the CRUD actions for GameSession model.

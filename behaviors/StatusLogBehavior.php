@@ -2,9 +2,9 @@
 
 namespace app\behaviors;
 
+use app\models\game\GameSessionLog;
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
-use app\models\GameSessionLog;
 
 class StatusLogBehavior extends Behavior
 {

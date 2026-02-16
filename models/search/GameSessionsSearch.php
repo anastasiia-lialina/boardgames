@@ -1,16 +1,15 @@
 <?php
 
-namespace app\models;
+namespace app\models\search;
 
+use app\models\game\GameSessions;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\GameSessions;
-use yii\helpers\ArrayHelper;
 
 /**
- * SearchGameSessions represents the model behind the search form of `app\models\GameSessions`.
+ * GameSessionsSearch represents the model behind the search form of `app\models\game\GameSessions`.
  */
-class SearchGameSessions extends GameSessions
+class GameSessionsSearch extends GameSessions
 {
     public $gameTitle;
     public $organizerUsername;

@@ -1,13 +1,14 @@
 <?php
 
-use app\models\Games;
-use yii\helpers\Html;
-use yii\helpers\Url;
+use app\models\game\Games;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\Pjax;
+
 /** @var yii\web\View $this */
-/** @var app\models\SearchGames $searchModel */
+/** @var \app\models\search\GamesSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
 $this->title = Yii::t('app', 'Games');

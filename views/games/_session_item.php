@@ -1,9 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\Url;
 
-/* @var $model app\models\GameSessions */
+/* @var $model \app\models\game\GameSessions */
 
 ?>
 <div class="panel panel-default" style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">

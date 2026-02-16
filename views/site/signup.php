@@ -1,10 +1,10 @@
 <?php
 
-use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\SignupForm */
+/* @var $model \app\models\forms\SignupForm */
 
 $this->title = Yii::t('app', 'Registration');
 ?>

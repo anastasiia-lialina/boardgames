@@ -2,10 +2,9 @@
 
 namespace app\commands;
 
-use app\models\User;
+use app\models\user\User;
 use Yii;
 use yii\console\Controller;
-use yii\rbac\DbManager;
 
 /**
  * RBAC controller for initializing roles and permissions

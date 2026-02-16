@@ -1,10 +1,10 @@
 <?php
 
 use app\components\RatingHelper;
-use app\models\Reviews;
+use app\models\user\Reviews;
 use yii\helpers\Html;
 
-/* @var $model app\models\Reviews */
+/* @var $model \app\models\user\Reviews */
 
 ?>
 <div class="panel panel-default" style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">

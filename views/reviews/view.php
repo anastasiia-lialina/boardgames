@@ -5,7 +5,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
-/** @var app\models\Reviews $model */
+/** @var \app\models\user\Reviews $model */
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Review Moderation'), 'url' => ['admin/index']];

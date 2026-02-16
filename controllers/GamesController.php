@@ -2,18 +2,17 @@
 
 namespace app\controllers;
 
-use app\models\Games;
-use app\models\Reviews;
-use app\models\SearchGames;
-use app\models\SearchGameSessions;
-use app\models\SearchReviews;
-use app\models\SearchUpcomingSessions;
+use app\models\game\Games;
+use app\models\search\GamesSearch;
+use app\models\search\ReviewsSearch;
+use app\models\search\GameSessionsSearch;
+use app\models\user\Reviews;
 use Yii;
 use yii\db\Exception;
 use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use yii\web\Response;
 
 /**
@@ -59,7 +58,7 @@ class GamesController extends Controller
      */
     public function actionIndex(): string
     {
-        $searchModel = new SearchGames();
+        $searchModel = new GamesSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -78,10 +77,10 @@ class GamesController extends Controller
     {
         $model = $this->findModel($id);
 
-        $reviewSearch = new SearchReviews();
+        $reviewSearch = new ReviewsSearch();
         $reviewsDataProvider = $reviewSearch->getApprovedReviewsForGame($id);
 
-        $sessionSearch = new SearchGameSessions();
+        $sessionSearch = new GameSessionsSearch();
         $sessionsDataProvider = $sessionSearch->getUpcomingSessionsForGame($id);
 
         $reviewForm = new Reviews();

@@ -1,11 +1,11 @@
 <?php
 
-namespace app\models;
+namespace app\models\user;
 
+use app\models\game\Games;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
-use yii\console\Application;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -105,9 +105,9 @@ class Reviews extends ActiveRecord
     /**
      * Gets query for [[Game]].
      *
-     * @return ActiveQuery|GamesQuery
+     * @return ActiveQuery
      */
-    public function getGame(): ActiveQuery|GamesQuery
+    public function getGame(): ActiveQuery
     {
         return $this->hasOne(Games::class, ['id' => 'game_id']);
     }
@@ -115,14 +115,5 @@ class Reviews extends ActiveRecord
     public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return ReviewsQuery the active query used by this AR class.
-     */
-    public static function find(): ReviewsQuery
-    {
-        return new ReviewsQuery(get_called_class());
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\game;
 
 use Yii;
 
@@ -52,15 +52,6 @@ class GameSessionLog extends \yii\db\ActiveRecord
             'new_status' => Yii::t('app', 'New Status'),
             'changed_at' => Yii::t('app', 'Changed At'),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return GameSessionLogQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new GameSessionLogQuery(get_called_class());
     }
 
 }

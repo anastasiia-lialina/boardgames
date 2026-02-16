@@ -1,14 +1,15 @@
 <?php
 
-use yii\helpers\Html;
-use yii\bootstrap5\ActiveForm; // Рекомендую использовать bootstrap5
-use yii\helpers\ArrayHelper;
-use app\models\Games;
-use app\models\GameSessions;
+use app\models\game\Games;
 use kartik\datetime\DateTimePicker;
+use yii\bootstrap5\ActiveForm;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+
+// Рекомендую использовать bootstrap5
 
 /* @var $this yii\web\View */
-/* @var $model app\models\GameSessions */
+/* @var $model \app\models\game\GameSessions */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

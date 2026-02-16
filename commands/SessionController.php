@@ -2,9 +2,8 @@
 
 namespace app\commands;
 
+use app\models\game\GameSessions;
 use yii\console\Controller;
-use app\models\GameSessions;
-use Yii;
 use yii\console\ExitCode;
 use yii\helpers\Console;
 

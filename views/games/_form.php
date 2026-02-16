@@ -1,11 +1,11 @@
 <?php
 
-use app\models\Games;
+use app\models\game\Games;
 use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var app\models\Games $model */
+/** @var app\models\game\Games $model */
 /** @var yii\bootstrap5\ActiveForm $form */
 ?>
 

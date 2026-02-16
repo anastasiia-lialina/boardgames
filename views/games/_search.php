@@ -1,10 +1,10 @@
 <?php
 
-use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
+use yii\helpers\Html;
 
 /** @var yii\web\View $this */
-/** @var app\models\SearchGames $model */
+/** @var \app\models\search\GamesSearch $model */
 /** @var yii\bootstrap5\ActiveForm $form */
 ?>
 

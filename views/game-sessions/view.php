@@ -1,6 +1,6 @@
 <?php
 
-use app\models\GameSessions;
+use app\models\game\GameSessions;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;

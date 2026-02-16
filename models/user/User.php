@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\user;
 
 use Yii;
 use yii\base\NotSupportedException;
@@ -60,13 +60,13 @@ class User extends ActiveRecord implements IdentityInterface
 
             ['username', 'trim'],
             ['username', 'required'],
-            ['username', 'unique', 'targetClass' => '\app\models\User', 'message' => Yii::t('app', 'This username has already been taken.')],
+            ['username', 'unique', 'targetClass' => '\app\models\user\User', 'message' => Yii::t('app', 'This username has already been taken.')],
             ['username', 'string', 'min' => 2, 'max' => 50],
 
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            ['email', 'unique', 'targetClass' => '\app\models\User', 'message' => Yii::t('app', 'This email address has already been taken.')],
+            ['email', 'unique', 'targetClass' => '\app\models\user\User', 'message' => Yii::t('app', 'This email address has already been taken.')],
 
             ['password_hash', 'required'],
         ];

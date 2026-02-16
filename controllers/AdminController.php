@@ -2,11 +2,11 @@
 
 namespace app\controllers;
 
-use app\models\SearchReviews;
+use app\models\search\ReviewsSearch;
+use app\models\user\Reviews;
 use Yii;
-use app\models\Reviews;
-use yii\web\Controller;
 use yii\filters\AccessControl;
+use yii\web\Controller;
 use yii\web\Response;
 
 /**
@@ -38,7 +38,7 @@ class AdminController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new SearchReviews();
+        $searchModel = new ReviewsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         $dataProvider->query->andWhere(['is_approved' => false]);//TODO replace to Reviews

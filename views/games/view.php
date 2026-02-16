@@ -1,18 +1,17 @@
 <?php
 
 use app\components\RatingHelper;
-use app\models\Reviews;
+use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-use yii\bootstrap5\ActiveForm;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Games */
-/* @var $reviewsDataProvider \app\models\SearchReviews */
-/* @var $sessionsDataProvider \app\models\SearchGameSessions */
-/* @var $reviewForm app\models\Reviews */
+/* @var $model app\models\game\Games */
+/* @var $reviewsDataProvider \app\models\search\ReviewsSearch */
+/* @var $sessionsDataProvider \app\models\search\GameSessionsSearch */
+/* @var $reviewForm \app\models\user\Reviews */
 
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Games'), 'url' => ['index']];

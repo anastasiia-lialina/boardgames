@@ -1,12 +1,12 @@
 <?php
 
 use app\components\RatingHelper;
-use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\SearchReviews */
+/* @var $searchModel \app\models\search\ReviewsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Review Moderation');

@@ -38,7 +38,7 @@ $config = [
             'database' => 0,
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass' => 'app\models\user\User',
             'enableAutoLogin' => true,
             'loginUrl' => ['site/login'],
         ],

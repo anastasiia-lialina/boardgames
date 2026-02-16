@@ -1,8 +1,9 @@
 <?php
 
-namespace app\models;
+namespace app\models\game;
 
 use app\behaviors\StatusLogBehavior;
+use app\models\user\User;
 use DateTime;
 use Yii;
 use yii\db\ActiveQuery;
@@ -159,9 +160,9 @@ class GameSessions extends ActiveRecord
     /**
      * Gets query for [[Games]].
      *
-     * @return ActiveQuery|GamesQuery
+     * @return ActiveQuery
      */
-    public function getGame(): ActiveQuery|GamesQuery
+    public function getGame(): ActiveQuery
     {
         return $this->hasOne(Games::class, ['id' => 'game_id']);
     }
@@ -172,18 +173,9 @@ class GameSessions extends ActiveRecord
     }
 
     /**
-     * {@inheritdoc}
-     * @return GameSessionsQuery the active query used by this AR class.
-     */
-    public static function find(): GameSessionsQuery
-    {
-        return new GameSessionsQuery(get_called_class());
-    }
-
-    /**
      * Получить все сессии по статусу
      */
-    public static function findByStatus($status): GameSessionsQuery
+    public static function findByStatus($status): ActiveQuery
     {
         return static::find()
             ->where(['status' => $status])

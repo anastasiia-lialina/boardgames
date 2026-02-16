@@ -2,13 +2,13 @@
 
 namespace app\controllers;
 
-use app\models\Reviews;
-use app\models\SearchReviews;
+use app\models\search\ReviewsSearch;
+use app\models\user\Reviews;
 use Yii;
 use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * ReviewsController implements the CRUD actions for Reviews model.
@@ -62,7 +62,7 @@ class ReviewsController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new SearchReviews();
+        $searchModel = new ReviewsSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
