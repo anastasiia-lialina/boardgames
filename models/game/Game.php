@@ -2,6 +2,7 @@
 
 namespace app\models\game;
 
+use app\models\user\Review;
 use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -23,10 +24,10 @@ use yii\db\Expression;
  * @property int $year Год выпуска
  * @property string $created_at Дата добавления
  *
- * @property GameSessions[] $gameSessions
- * @property Reviews[] $reviews
+ * @property GameSession[] $gameSessions
+ * @property Review[] $reviews
  */
-class Games extends ActiveRecord
+class Game extends ActiveRecord
 {
     const MIN_PLAYERS = 1;
     const MAX_PLAYERS = 20;
@@ -105,7 +106,7 @@ class Games extends ActiveRecord
      */
     public function getAverageRating(): float|int
     {
-        $rating = Reviews::find()
+        $rating = Review::find()
             ->where(['game_id' => $this->id, 'is_approved' => true])
             ->average('rating');
 
@@ -117,7 +118,7 @@ class Games extends ActiveRecord
      */
     public function getReviewsCount(): int
     {
-        return Reviews::find()
+        return Review::find()
             ->where(['game_id' => $this->id, 'is_approved' => true])
             ->count();
     }
@@ -127,7 +128,7 @@ class Games extends ActiveRecord
      */
     public function getApprovedReviews(): ActiveQuery
     {
-        return $this->hasMany(Reviews::class, ['game_id' => 'id'])
+        return $this->hasMany(Review::class, ['game_id' => 'id'])
             ->where(['is_approved' => true])
             ->orderBy(['created_at' => SORT_DESC]);
     }
@@ -137,7 +138,7 @@ class Games extends ActiveRecord
      */
     public function getReviews(): ActiveQuery
     {
-        return $this->hasMany(Reviews::class, ['game_id' => 'id']);
+        return $this->hasMany(Review::class, ['game_id' => 'id']);
     }
 
     /**
@@ -145,7 +146,7 @@ class Games extends ActiveRecord
      */
     public function getSessions(): ActiveQuery
     {
-        return $this->hasMany(GameSessions::class, ['game_id' => 'id']);
+        return $this->hasMany(GameSession::class, ['game_id' => 'id']);
     }
 
     /**
@@ -153,9 +154,9 @@ class Games extends ActiveRecord
      */
     public function getUpcomingSessions(): ActiveQuery
     {
-        return $this->hasMany(GameSessions::class, ['game_id' => 'id'])
+        return $this->hasMany(GameSession::class, ['game_id' => 'id'])
             ->where(['>=', 'scheduled_at', date('Y-m-d H:i:s')])
-            ->andWhere(['status' => GameSessions::STATUS_PLANNED])
+            ->andWhere(['status' => GameSession::STATUS_PLANNED])
             ->orderBy(['scheduled_at' => SORT_ASC]);
     }
 

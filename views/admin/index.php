@@ -6,7 +6,7 @@ use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $searchModel \app\models\search\ReviewsSearch */
+/* @var $searchModel \app\models\search\ReviewSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Review Moderation');

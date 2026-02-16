@@ -4,7 +4,7 @@ use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
-/** @var \app\models\search\GamesSearch $model */
+/** @var \app\models\search\GameSearch $model */
 /** @var yii\bootstrap5\ActiveForm $form */
 ?>
 

@@ -2,9 +2,9 @@
 
 namespace app\commands;
 
-use app\models\game\GameSessions;
-use app\models\game\Games;
-use app\models\user\Reviews;
+use app\models\game\GameSession;
+use app\models\game\Game;
+use app\models\user\Review;
 use app\models\user\User;
 use Yii;
 use yii\console\Controller;
@@ -182,7 +182,7 @@ class SeedController extends Controller
 
         $created = 0;
         foreach ($gamesData as $data) {
-            $game = new Games();
+            $game = new Game();
             $game->attributes = $data;
 
             if ($game->save()) {
@@ -202,7 +202,7 @@ class SeedController extends Controller
      */
     public function actionReviews($count = 20)
     {
-        $games = Games::find()->all();
+        $games = Game::find()->all();
         $userIds = $this->getUserIds();
 
         if (empty($games)) {
@@ -230,7 +230,7 @@ class SeedController extends Controller
             $game = $games[array_rand($games)];
             $reviewData = $reviewsData[array_rand($reviewsData)];
 
-            $review = new Reviews();
+            $review = new Review();
             $review->detachBehavior('blameable');
             $review->game_id = $game->id;
             $review->user_id = $userIds[array_rand($userIds)];
@@ -257,7 +257,7 @@ class SeedController extends Controller
      */
     public function actionSessions($count = 5)
     {
-        $games = Games::find()->all();
+        $games = Game::find()->all();
 
         if (empty($games)) {
             $this->stderr("Нет игр в базе. Сначала создайте игры: yii seed/games\n");
@@ -271,12 +271,12 @@ class SeedController extends Controller
         for ($i = 0; $i < $count; $i++) {
             $game = $games[array_rand($games)];
 
-            $session = new GameSessions();
+            $session = new GameSession();
             $session->game_id = $game->id;
             $session->organizer_id = $userIds[array_rand($userIds)];
             $session->scheduled_at = (new \DateTime())->modify('+5 days')->format('d.m.Y H:i');;
             $session->max_participants = rand(3, 8);
-            $session->status = GameSessions::STATUS_PLANNED;
+            $session->status = GameSession::STATUS_PLANNED;
 
             if ($session->save()) {
                 $created++;

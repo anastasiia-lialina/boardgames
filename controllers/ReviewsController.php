@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
-use app\models\search\ReviewsSearch;
-use app\models\user\Reviews;
+use app\models\search\ReviewSearch;
+use app\models\user\Review;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -11,7 +11,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 /**
- * ReviewsController implements the CRUD actions for Reviews model.
+ * ReviewsController implements the CRUD actions for Review model.
  */
 class ReviewsController extends Controller
 {
@@ -62,7 +62,7 @@ class ReviewsController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new ReviewsSearch();
+        $searchModel = new ReviewSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -91,7 +91,7 @@ class ReviewsController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Reviews();
+        $model = new Review();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
@@ -149,12 +149,12 @@ class ReviewsController extends Controller
      * Finds the Reviews model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Reviews the loaded model
+     * @return Review the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Reviews::findOne(['id' => $id])) !== null) {
+        if (($model = Review::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

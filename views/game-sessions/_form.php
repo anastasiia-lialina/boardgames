@@ -1,6 +1,6 @@
 <?php
 
-use app\models\game\Games;
+use app\models\game\Game;
 use kartik\datetime\DateTimePicker;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -9,7 +9,7 @@ use yii\helpers\Html;
 // Рекомендую использовать bootstrap5
 
 /* @var $this yii\web\View */
-/* @var $model \app\models\game\GameSessions */
+/* @var $model \app\models\game\GameSession */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -20,7 +20,7 @@ use yii\helpers\Html;
     ]); ?>
 
     <?= $form->field($model, 'game_id')->dropDownList(
-            ArrayHelper::map(Games::find()->orderBy('title')->all(), 'id', 'title'),
+            ArrayHelper::map(Game::find()->orderBy('title')->all(), 'id', 'title'),
             ['prompt' => Yii::t('app', 'Select game...')]
     ) ?>
 

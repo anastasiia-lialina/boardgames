@@ -2,14 +2,14 @@
 
 namespace app\models\search;
 
-use app\models\game\Games;
+use app\models\game\Game;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
  * SearchGame represents the model behind the search form of `app\models\game\Game`.
  */
-class GamesSearch extends Games
+class GameSearch extends Game
 {
     /**
      * {@inheritdoc}
@@ -42,7 +42,7 @@ class GamesSearch extends Games
      */
     public function search($params, $formName = null)
     {
-        $query = Games::find();
+        $query = Game::find();
 
         // add conditions that should always apply here
 

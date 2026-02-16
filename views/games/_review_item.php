@@ -1,17 +1,17 @@
 <?php
 
 use app\components\RatingHelper;
-use app\models\user\Reviews;
+use app\models\user\Review;
 use yii\helpers\Html;
 
-/* @var $model \app\models\user\Reviews */
+/* @var $model \app\models\user\Review */
 
 ?>
 <div class="panel panel-default" style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
     <div class="panel-body">
         <h4>
             <?= RatingHelper::renderStars($model->rating); ?>
-            <small class="text-muted">(<?= $model->rating?>/<?= Reviews::MAX_RATING?>)</small>
+            <small class="text-muted">(<?= $model->rating?>/<?= Review::MAX_RATING?>)</small>
         </h4>
         <?php if ($model->comment): ?>
             <p><?= nl2br(Html::encode($model->comment)) ?></p>

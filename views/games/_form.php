@@ -1,11 +1,11 @@
 <?php
 
-use app\models\game\Games;
+use app\models\game\Game;
 use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var app\models\game\Games $model */
+/** @var app\models\game\Game $model */
 /** @var yii\bootstrap5\ActiveForm $form */
 ?>
 
@@ -17,13 +17,13 @@ use yii\bootstrap5\ActiveForm;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'players_min')->input('number', ['min' => Games::MIN_PLAYERS, 'max' => Games::MAX_PLAYERS]) ?>
+    <?= $form->field($model, 'players_min')->input('number', ['min' => Game::MIN_PLAYERS, 'max' => Game::MAX_PLAYERS]) ?>
 
-    <?= $form->field($model, 'players_max')->input('number', ['min' => Games::MIN_PLAYERS, 'max' => Games::MAX_PLAYERS]) ?>
+    <?= $form->field($model, 'players_max')->input('number', ['min' => Game::MIN_PLAYERS, 'max' => Game::MAX_PLAYERS]) ?>
 
-    <?= $form->field($model, 'duration_min')->input('number', ['min' => Games::MIN_DURATION]) ?>
+    <?= $form->field($model, 'duration_min')->input('number', ['min' => Game::MIN_DURATION]) ?>
 
-    <?= $form->field($model, 'complexity')->input('number', ['min' => Games::MIN_COMPLEXITY]) ?>
+    <?= $form->field($model, 'complexity')->input('number', ['min' => Game::MIN_COMPLEXITY]) ?>
 
     <?= $form->field($model, 'year')->textInput() ?>
 

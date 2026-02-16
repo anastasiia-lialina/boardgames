@@ -2,11 +2,11 @@
 
 namespace app\controllers;
 
-use app\models\game\Games;
-use app\models\search\GamesSearch;
-use app\models\search\ReviewsSearch;
-use app\models\search\GameSessionsSearch;
-use app\models\user\Reviews;
+use app\models\game\Game;
+use app\models\search\GameSearch;
+use app\models\search\ReviewSearch;
+use app\models\search\GameSessionSearch;
+use app\models\user\Review;
 use Yii;
 use yii\db\Exception;
 use yii\filters\AccessControl;
@@ -16,7 +16,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
- * GameController implements the CRUD actions for Games model.
+ * GameController implements the CRUD actions for Game model.
  */
 class GamesController extends Controller
 {
@@ -58,7 +58,7 @@ class GamesController extends Controller
      */
     public function actionIndex(): string
     {
-        $searchModel = new GamesSearch();
+        $searchModel = new GameSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -77,13 +77,13 @@ class GamesController extends Controller
     {
         $model = $this->findModel($id);
 
-        $reviewSearch = new ReviewsSearch();
+        $reviewSearch = new ReviewSearch();
         $reviewsDataProvider = $reviewSearch->getApprovedReviewsForGame($id);
 
-        $sessionSearch = new GameSessionsSearch();
+        $sessionSearch = new GameSessionSearch();
         $sessionsDataProvider = $sessionSearch->getUpcomingSessionsForGame($id);
 
-        $reviewForm = new Reviews();
+        $reviewForm = new Review();
         $reviewForm->game_id = $id;
 
         if ($reviewForm->load(Yii::$app->request->post())) {
@@ -110,7 +110,7 @@ class GamesController extends Controller
      */
     public function actionCreate(): Response|string
     {
-        $model = new Games();
+        $model = new Game();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
@@ -163,12 +163,12 @@ class GamesController extends Controller
      * Finds the Game model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Games the loaded model
+     * @return Game the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id): Games
+    protected function findModel($id): Game
     {
-        if (($model = Games::findOne(['id' => $id])) !== null) {
+        if (($model = Game::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

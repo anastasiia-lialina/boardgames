@@ -2,7 +2,7 @@
 
 namespace app\commands;
 
-use app\models\game\GameSessions;
+use app\models\game\GameSession;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\helpers\Console;
@@ -18,7 +18,7 @@ class SessionController extends Controller
     public function actionUpdateStatus(): int
     {
         try {
-            $count = GameSessions::updateExpiredSessions();
+            $count = GameSession::updateExpiredSessions();
 
             if ($count > 0) {
                 $this->stdout("Успешно отменено просроченных сессий: $count\n", Console::FG_GREEN);
@@ -37,7 +37,7 @@ class SessionController extends Controller
      */
     public function actionCheckStale(): void
     {
-        $count = GameSessions::findStalePlannedCount();
+        $count = GameSession::findStalePlannedCount();
 
         if ($count > 0) {
             $this->stdout("Найдено просроченных сессий: $count\n", Console::FG_CYAN);

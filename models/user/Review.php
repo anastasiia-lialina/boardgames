@@ -2,7 +2,7 @@
 
 namespace app\models\user;
 
-use app\models\game\Games;
+use app\models\game\Game;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -21,9 +21,8 @@ use yii\db\Expression;
  * @property bool $is_approved Статус модерации
  * @property string $created_at Дата добавления
  *
- * @property Games $games
  */
-class Reviews extends ActiveRecord
+class Review extends ActiveRecord
 {
 
     const MIN_RATING = 1;
@@ -80,7 +79,7 @@ class Reviews extends ActiveRecord
                 'message' => Yii::t('app', 'You have already left a review for this game.')
             ],
 
-            [['game_id'], 'exist', 'skipOnError' => true, 'targetClass' => Games::class, 'targetAttribute' => ['game_id' => 'id']],
+            [['game_id'], 'exist', 'skipOnError' => true, 'targetClass' => Game::class, 'targetAttribute' => ['game_id' => 'id']],
         ];
     }
 
@@ -109,7 +108,7 @@ class Reviews extends ActiveRecord
      */
     public function getGame(): ActiveQuery
     {
-        return $this->hasOne(Games::class, ['id' => 'game_id']);
+        return $this->hasOne(Game::class, ['id' => 'game_id']);
     }
 
     public function getUser(): ActiveQuery

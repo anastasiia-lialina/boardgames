@@ -1,6 +1,6 @@
 <?php
 
-use app\models\user\Reviews;
+use app\models\user\Review;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -8,7 +8,7 @@ use yii\helpers\Url;
 use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
-/** @var \app\models\search\ReviewsSearch $searchModel */
+/** @var \app\models\search\ReviewSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
 $this->title = Yii::t('app', 'Reviews');
@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'created_at:datetime',
             [
                 'class' => ActionColumn::class,
-                'urlCreator' => function ($action, Reviews $model, $key, $index, $column) {
+                'urlCreator' => function ($action, Review $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
             ],

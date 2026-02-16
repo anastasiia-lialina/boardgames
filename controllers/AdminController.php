@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
-use app\models\search\ReviewsSearch;
-use app\models\user\Reviews;
+use app\models\search\ReviewSearch;
+use app\models\user\Review;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -38,7 +38,7 @@ class AdminController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new ReviewsSearch();
+        $searchModel = new ReviewSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         $dataProvider->query->andWhere(['is_approved' => false]);//TODO replace to Reviews
@@ -54,7 +54,7 @@ class AdminController extends Controller
      */
     public function actionApprove($id): Response
     {
-        $model = Reviews::findOne($id);
+        $model = Review::findOne($id);
 
         if ($model) {
             $model->is_approved = true;
@@ -76,7 +76,7 @@ class AdminController extends Controller
      */
     public function actionReject($id): Response
     {
-        $model = Reviews::findOne($id);
+        $model = Review::findOne($id);
 
         if ($model && $model->delete()) {
             Yii::$app->session->setFlash('success',  Yii::t('app','Отзыв отклонён!'));

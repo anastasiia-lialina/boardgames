@@ -8,10 +8,10 @@ use yii\widgets\ListView;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\game\Games */
-/* @var $reviewsDataProvider \app\models\search\ReviewsSearch */
-/* @var $sessionsDataProvider \app\models\search\GameSessionsSearch */
-/* @var $reviewForm \app\models\user\Reviews */
+/* @var $model app\models\game\Game */
+/* @var $reviewsDataProvider \app\models\search\ReviewSearch */
+/* @var $sessionsDataProvider \app\models\search\GameSessionSearch */
+/* @var $reviewForm \app\models\user\Review */
 
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Games'), 'url' => ['index']];

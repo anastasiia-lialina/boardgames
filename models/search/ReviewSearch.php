@@ -2,14 +2,14 @@
 
 namespace app\models\search;
 
-use app\models\user\Reviews;
+use app\models\user\Review;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * SearchReviews represents the model behind the search form of `app\models\user\Reviews`.
+ * SearchReviews represents the model behind the search form of `app\models\user\Review`.
  */
-class ReviewsSearch extends Reviews
+class ReviewSearch extends Review
 {
     public $gameTitle;
     public $username;
@@ -43,7 +43,7 @@ class ReviewsSearch extends Reviews
      */
     public function search($params, $formName = null)
     {
-        $query = Reviews::find()->joinWith(['game', 'user']);
+        $query = Review::find()->joinWith(['game', 'user']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -62,8 +62,8 @@ class ReviewsSearch extends Reviews
                     'is_approved',
                     'created_at',
                     'gameTitle' => [
-                        'asc' => ['games.title' => SORT_ASC],
-                        'desc' => ['games.title' => SORT_DESC],
+                        'asc' => ['game.title' => SORT_ASC],
+                        'desc' => ['game.title' => SORT_DESC],
                     ],
                     'username' => [
                         'asc' => ['user.username' => SORT_ASC],
@@ -87,12 +87,12 @@ class ReviewsSearch extends Reviews
             'rating' => $this->rating,
             'is_approved' => $this->is_approved,
             'created_at' => $this->created_at,
-            'games.title' => $this->gameTitle,
+            'game.title' => $this->gameTitle,
             'user.username' => $this->username,
         ]);
 
         $query->andFilterWhere(['ilike', 'comment', $this->comment]);
-        $query->andFilterWhere(['ilike', 'games.title', $this->gameTitle]);
+        $query->andFilterWhere(['ilike', 'game.title', $this->gameTitle]);
         $query->andFilterWhere(['ilike', 'user.username', $this->username]);
 
         return $dataProvider;

@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model \app\models\game\GameSessions */
+/* @var $model \app\models\game\GameSession */
 
 $this->title = Yii::t('app', 'Update Session #{id}', ['id' => $model->id]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Game Sessions'), 'url' => ['index']];

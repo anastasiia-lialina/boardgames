@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
-use app\models\game\GameSessions;
-use app\models\search\SearchGameSessions;
+use app\models\game\GameSession;
+use app\models\search\GameSessionSearch;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -64,10 +64,10 @@ class GameSessionsController extends Controller
     {
         // Для тестирования обновляем статусы при открытии списка, на проде это должно происходить через крон
         if (YII_ENV === 'dev') {
-            GameSessions::updateExpiredSessions();
+            GameSession::updateExpiredSessions();
         }
 
-        $searchModel = new SearchGameSessions();
+        $searchModel = new GameSessionSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -96,7 +96,7 @@ class GameSessionsController extends Controller
      */
     public function actionCreate()
     {
-        $model = new GameSessions();
+        $model = new GameSession();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
@@ -154,12 +154,12 @@ class GameSessionsController extends Controller
      * Finds the GameSession model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return GameSessions the loaded model
+     * @return GameSession the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = GameSessions::findOne($id)) !== null) {
+        if (($model = GameSession::findOne($id)) !== null) {
             return $model;
         }
 

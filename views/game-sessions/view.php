@@ -1,12 +1,12 @@
 <?php
 
-use app\models\game\GameSessions;
+use app\models\game\GameSession;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model GameSessions */
+/* @var $model GameSession */
 
 $this->title = Yii::t('app', 'Session #{id}', ['id' => $model->id]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Game Sessions'), 'url' => ['index']];
@@ -38,10 +38,7 @@ YiiAsset::register($this);
                             'value' => Html::a($model->game->title, ['game/view', 'id' => $model->game_id], ['target' => '_blank']),
                             'format' => 'raw',
                     ],
-                    [
-                            'attribute' => 'organizer_id',
-                            'value' => Yii::t('app', 'User #{id}', ['id' => $model->organizer_id]),
-                    ],
+                    'organizer.username',
                     'scheduled_at:datetime',
                     'max_participants',
                     [

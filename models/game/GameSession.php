@@ -21,9 +21,9 @@ use yii\helpers\ArrayHelper;
  * @property string $status Статус сессии
  * @property string $created_at Дата добавления
  *
- * @property Games $game
+ * @property Game $game
  */
-class GameSessions extends ActiveRecord
+class GameSession extends ActiveRecord
 {
 
     const STATUS_PLANNED = 'planned';
@@ -67,7 +67,7 @@ class GameSessions extends ActiveRecord
 
             ['scheduled_at', 'validateScheduledAt'],
 
-            [['game_id'], 'exist', 'skipOnError' => true, 'targetClass' => Games::class, 'targetAttribute' => ['game_id' => 'id']],
+            [['game_id'], 'exist', 'skipOnError' => true, 'targetClass' => Game::class, 'targetAttribute' => ['game_id' => 'id']],
         ];
     }
 
@@ -158,13 +158,13 @@ class GameSessions extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Games]].
+     * Gets query for [[Game]].
      *
      * @return ActiveQuery
      */
     public function getGame(): ActiveQuery
     {
-        return $this->hasOne(Games::class, ['id' => 'game_id']);
+        return $this->hasOne(Game::class, ['id' => 'game_id']);
     }
 
     public function getOrganizer(): ActiveQuery

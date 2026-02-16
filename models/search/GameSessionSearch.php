@@ -2,14 +2,14 @@
 
 namespace app\models\search;
 
-use app\models\game\GameSessions;
+use app\models\game\GameSession;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * GameSessionsSearch represents the model behind the search form of `app\models\game\GameSessions`.
+ * GameSessionsSearch represents the model behind the search form of `app\models\game\GameSession`.
  */
-class GameSessionsSearch extends GameSessions
+class GameSessionSearch extends GameSession
 {
     public $gameTitle;
     public $organizerUsername;
@@ -43,7 +43,7 @@ class GameSessionsSearch extends GameSessions
      */
     public function search($params, $formName = null)
     {
-        $query = GameSessions::find()->joinWith(['game', 'organizer']);
+        $query = GameSession::find()->joinWith(['game', 'organizer']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

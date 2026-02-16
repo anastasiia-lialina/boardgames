@@ -1,6 +1,6 @@
 <?php
 
-use app\models\game\Games;
+use app\models\game\Game;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -8,7 +8,7 @@ use yii\helpers\Url;
 use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
-/** @var \app\models\search\GamesSearch $searchModel */
+/** @var \app\models\search\GameSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
 $this->title = Yii::t('app', 'Games');
@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'created_at',
             [
                 'class' => ActionColumn::class,
-                'urlCreator' => function ($action, Games $model, $key, $index, $column) {
+                'urlCreator' => function ($action, Game $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
             ],

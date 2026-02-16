@@ -1,12 +1,12 @@
 <?php
 
-use app\models\game\GameSessions;
+use app\models\game\GameSession;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $searchModel \app\models\search\GameSessionsSearch */
+/* @var $searchModel \app\models\search\GameSessionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Game Sessions');
@@ -43,10 +43,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'status',
                             'value' => function ($model) {
                                 $classMap = [
-                                        GameSessions::STATUS_PLANNED => 'label-info',
-                                        GameSessions::STATUS_ACTIVE => 'label-primary',
-                                        GameSessions::STATUS_COMPLETED => 'label-success',
-                                        GameSessions::STATUS_CANCELLED => 'label-danger',
+                                        GameSession::STATUS_PLANNED => 'label-info',
+                                        GameSession::STATUS_ACTIVE => 'label-primary',
+                                        GameSession::STATUS_COMPLETED => 'label-success',
+                                        GameSession::STATUS_CANCELLED => 'label-danger',
                                 ];
                                 $class = $classMap[$model->status] ?? 'label-default';
                                 return Html::tag('span', $model->statusLabel, ['class' => "label $class"]);
