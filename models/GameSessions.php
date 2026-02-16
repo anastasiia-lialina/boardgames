@@ -82,6 +82,8 @@ class GameSessions extends ActiveRecord
             'max_participants' => Yii::t('app', 'Max Participants'),
             'status' => Yii::t('app', 'Status'),
             'created_at' => Yii::t('app', 'Created At'),
+            'organizerUsername' => Yii::t('app', 'Organizer'),
+            'gameTitle' => Yii::t('app', 'Game'),
         ];
     }
 
@@ -154,6 +156,11 @@ class GameSessions extends ActiveRecord
     public function getGame(): ActiveQuery|GamesQuery
     {
         return $this->hasOne(Games::class, ['id' => 'game_id']);
+    }
+
+    public function getOrganizer(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'organizer_id']);
     }
 
     /**

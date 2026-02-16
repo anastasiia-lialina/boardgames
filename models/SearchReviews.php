@@ -11,6 +11,8 @@ use app\models\Reviews;
  */
 class SearchReviews extends Reviews
 {
+    public $gameTitle;
+    public $username;
     /**
      * {@inheritdoc}
      */
@@ -18,7 +20,7 @@ class SearchReviews extends Reviews
     {
         return [
             [['id', 'game_id', 'user_id', 'rating'], 'integer'],
-            [['comment', 'created_at'], 'safe'],
+            [['comment', 'created_at', 'gameTitle', 'sername'], 'safe'],
             [['is_approved'], 'boolean'],
         ];
     }
@@ -28,7 +30,6 @@ class SearchReviews extends Reviews
      */
     public function scenarios()
     {
-        // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
 
@@ -42,19 +43,39 @@ class SearchReviews extends Reviews
      */
     public function search($params, $formName = null)
     {
-        $query = Reviews::find();
-
-        // add conditions that should always apply here
+        $query = Reviews::find()->joinWith(['game', 'user']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' =>  20,
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC,
+                ],
+                'attributes' => [
+                    'id',
+                    'game_id',
+                    'user_id',
+                    'rating',
+                    'is_approved',
+                    'created_at',
+                    'gameTitle' => [
+                        'asc' => ['games.title' => SORT_ASC],
+                        'desc' => ['games.title' => SORT_DESC],
+                    ],
+                    'username' => [
+                        'asc' => ['user.username' => SORT_ASC],
+                        'desc' => ['user.username' => SORT_DESC],
+                    ],
+                ]
+            ],
         ]);
 
         $this->load($params, $formName);
 
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
             return $dataProvider;
         }
 
@@ -66,9 +87,13 @@ class SearchReviews extends Reviews
             'rating' => $this->rating,
             'is_approved' => $this->is_approved,
             'created_at' => $this->created_at,
+            'games.title' => $this->gameTitle,
+            'user.username' => $this->username,
         ]);
 
         $query->andFilterWhere(['ilike', 'comment', $this->comment]);
+        $query->andFilterWhere(['ilike', 'games.title', $this->gameTitle]);
+        $query->andFilterWhere(['ilike', 'user.username', $this->username]);
 
         return $dataProvider;
     }
@@ -80,7 +105,7 @@ class SearchReviews extends Reviews
      * @param int $pageSize
      * @return ActiveDataProvider
      */
-    public function getApprovedReviewsForGame($gameId, $pageSize = 2)
+    public function getApprovedReviewsForGame(int $gameId, int $pageSize = 2): ActiveDataProvider
     {
         $query = self::find()
             ->where(['game_id' => $gameId, 'is_approved' => true])

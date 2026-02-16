@@ -26,8 +26,14 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'game_id',
-            'user_id',
+            [
+                'attribute' => 'gameTitle',
+                'value' => 'game.title',
+            ],
+            [
+                'attribute' => 'username',
+                'value' => 'user.username',
+            ],
             'rating',
             'comment:ntext',
             'is_approved:boolean',

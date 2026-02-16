@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Reviews;
 use app\models\SearchReviews;
 use Yii;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -19,17 +20,39 @@ class ReviewsController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::class,
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view'],
+                        'roles' => ['?', '@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create'],
+                        'roles' => ['@'],
+                        'permissions' => ['createReview'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['update', 'delete'],
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            $model = $this->findModel(Yii::$app->request->get('id'));
+                            return $model->user_id == Yii::$app->user->id;
+                        },
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -73,7 +96,7 @@ class ReviewsController extends Controller
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
                 $model->user_id = Yii::$app->user->id;
-var_dump($model->getErrors());exit;
+
                 if ($model->save()) {
                     Yii::$app->session->setFlash('success', Yii::t('app', 'Отзыв отправлен на модерацию!'));
                     return $this->redirect(['game/view', 'id' => $model->game_id]);

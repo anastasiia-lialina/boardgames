@@ -62,4 +62,12 @@ return [
     'The scheduled date must be in the future.' => 'Дата проведения должна быть в будущем.',
     'An active session must have already started.' => 'Активная сессия должна уже начаться.',
     'A completed session must be in the past.' => 'Завершённая сессия должна быть в прошлом.',
+    'This username has already been taken.' => 'Это имя пользователя уже занято.',
+    'This email address has already been taken.' => 'Этот email уже используется.',
+    'Username' => 'Имя пользователя',
+    'Email' => 'Email',
+    'Updated At' => 'Дата обновления',
+    'log in' => 'войдите',
+    'register' => 'зарегистрируйтесь',
+    'To leave a review, please {login} or {signup}.' => 'Чтобы оставить отзыв, пожалуйста, {login} или {signup}.',
 ];

@@ -26,6 +26,7 @@ class AdminController extends Controller
                     [
                         'allow' => true,
                         'roles' => ['@'],
+                        'permissions' => ['manageReviews'],
                     ],
                 ],
             ],

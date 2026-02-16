@@ -1,5 +1,6 @@
 <?php
 
+use app\components\RatingHelper;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -31,8 +32,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'game_id',
-            'user_id',
-            'rating',
+            'user.username',
+            [
+                'attribute' => 'rating',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return RatingHelper::renderStars($model->rating);
+                },
+            ],
             'comment:ntext',
             'is_approved:boolean',
             'created_at:datetime',

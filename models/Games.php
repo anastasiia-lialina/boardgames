@@ -65,6 +65,8 @@ class Games extends ActiveRecord
             [['players_min', 'players_max', 'duration_min', 'year'], 'integer'],
             ['complexity', 'number'],
 
+            [['title', 'description'], 'trim'],
+
             ['title', 'string', 'max' => 200, 'min' => 3],
             ['description', 'string'],
 

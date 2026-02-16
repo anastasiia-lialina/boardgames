@@ -13,6 +13,7 @@ use yii\helpers\ArrayHelper;
 class SearchGameSessions extends GameSessions
 {
     public $gameTitle;
+    public $organizerUsername;
     /**
      * {@inheritdoc}
      */
@@ -20,7 +21,7 @@ class SearchGameSessions extends GameSessions
     {
         return [
             [['id', 'game_id', 'organizer_id', 'max_participants'], 'integer'],
-            [['scheduled_at', 'status', 'created_at', 'gameTitle'], 'safe'],
+            [['scheduled_at', 'status', 'created_at', 'gameTitle', 'organizerUsername'], 'safe'],
         ];
     }
 
@@ -43,7 +44,7 @@ class SearchGameSessions extends GameSessions
      */
     public function search($params, $formName = null)
     {
-        $query = GameSessions::find()->joinWith(['game']);
+        $query = GameSessions::find()->joinWith(['game', 'organizer']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -62,6 +63,10 @@ class SearchGameSessions extends GameSessions
                     'gameTitle' => [
                         'asc' => ['games.title' => SORT_ASC],
                         'desc' => ['games.title' => SORT_DESC],
+                    ],
+                    'organizerUsername' => [
+                        'asc' => ['user.username' => SORT_ASC],
+                        'desc' => ['user.username' => SORT_DESC],
                     ],
                 ],
             ],
@@ -86,6 +91,7 @@ class SearchGameSessions extends GameSessions
         $query->andFilterWhere(['ilike', 'status', $this->status]);
         // Фильтрация по названию игры
         $query->andFilterWhere(['like', 'games.title', $this->gameTitle]);
+        $query->andFilterWhere(['like', 'user.username', $this->organizerUsername]);
 
         return $dataProvider;
     }

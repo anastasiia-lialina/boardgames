@@ -1,11 +1,12 @@
 <?php
 
+use app\components\RatingHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\ReviewsSearch */
+/* @var $searchModel app\models\SearchReviews */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Review Moderation');
@@ -29,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     'id',
                     [
-                            'attribute' => 'game.title',
+                            'attribute' => 'gameTitle',
                             'label' => Yii::t('app', 'Game'),
                             'value' => function ($model) {
                                 return Html::a($model->game->title, ['games/view', 'id' => $model->game_id], ['target' => '_blank']);
@@ -37,12 +38,16 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format' => 'raw',
                     ],
                     [
-                            'attribute' => 'user_id',
+                            'attribute' => 'username',
+                            'value' => 'user.username',
+                    ],
+                    [
+                            'attribute' => 'rating',
+                            'format' => 'raw',
                             'value' => function ($model) {
-                                return Yii::t('app', 'User #{id}', ['id' => $model->user_id]);
+                                return RatingHelper::renderStars($model->rating);
                             },
                     ],
-                    'rating',
                     [
                             'attribute' => 'comment',
                             'value' => function ($model) {

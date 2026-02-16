@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\console\Application;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -45,7 +46,7 @@ class Reviews extends ActiveRecord
                 'updatedAtAttribute' => false,
                 'value' => new Expression('NOW()'),
             ],
-            [
+            'blameable' => [
                 'class' => BlameableBehavior::class,
                 'updatedByAttribute' => false,
                 'createdByAttribute' => 'user_id',
@@ -64,6 +65,8 @@ class Reviews extends ActiveRecord
             [['game_id', 'user_id', 'rating'], 'integer'],
 
             ['rating', 'integer', 'min' => self::MIN_RATING, 'max' => self::MAX_RATING],
+
+            [['comment'], 'trim'],
 
             ['comment', 'string', 'max' => self::MAX_COMMENT_LENGTH],
 
@@ -94,6 +97,8 @@ class Reviews extends ActiveRecord
             'comment' => Yii::t('app', 'Comment'),
             'is_approved' => Yii::t('app', 'Is Approved'),
             'created_at' => Yii::t('app', 'Created At'),
+            'username' => Yii::t('app', 'User'),
+            'gameTitle' => Yii::t('app', 'Game'),
         ];
     }
 
@@ -105,6 +110,11 @@ class Reviews extends ActiveRecord
     public function getGame(): ActiveQuery|GamesQuery
     {
         return $this->hasOne(Games::class, ['id' => 'game_id']);
+    }
+
+    public function getUser(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
     /**

@@ -30,22 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     'id',
                     [
-                            'attribute' => 'gameTitle',
-                            'label' => Yii::t('app', 'Game'),
-                            'value' => function ($model) {
-                                return Html::a($model->game->title, ['game/view', 'id' => $model->game_id], ['target' => '_blank']);
-                            },
-                            'format' => 'raw',
-                            'filter' => Html::activeTextInput($searchModel, 'gameTitle', [
-                                    'class' => 'form-control',
-                                    'placeholder' => Yii::t('app', 'Поиск по названию...'),
-                            ]),
+                        'attribute' => 'gameTitle',
+                        'value' => 'game.title',
                     ],
                     [
-                            'attribute' => 'organizer_id',
-                            'value' => function ($model) {
-                                return Yii::t('app', 'User #{id}', ['id' => $model->organizer_id]);
-                            },
+                        'attribute' => 'organizerUsername',
+                        'value' => 'organizer.username',
                     ],
                     'scheduled_at:datetime',
                     'max_participants',

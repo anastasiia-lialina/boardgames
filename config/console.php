@@ -14,6 +14,10 @@ $config = [
         '@tests' => '@app/tests',
     ],
     'components' => [
+        'formatter' => [
+            'dateFormat' => 'dd.MM.yyyy',
+            'datetimeFormat' => 'dd.MM.yyyy HH:mm',
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -26,15 +30,16 @@ $config = [
             ],
         ],
         'db' => $db,
-    ],
-    'params' => $params,
-    /*
-    'controllerMap' => [
-        'fixture' => [ // Fixture generation command line.
-            'class' => 'yii\faker\FixtureController',
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
         ],
     ],
-    */
+    'params' => $params,
+    'controllerMap' => [
+        'rbac' => 'app\commands\RbacController',
+        'seed' => 'app\commands\SeedController',
+    ],
+
 ];
 
 if (YII_ENV_DEV) {

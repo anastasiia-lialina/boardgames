@@ -31,6 +31,38 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
 <header id="header">
     <?php
+    // Меню для авторизованных пользователей
+    if (Yii::$app->user->isGuest) {
+        $menuItems[] = ['label' => Yii::t('app', 'Signup'), 'url' => ['/site/signup']];
+        $menuItems[] = ['label' => Yii::t('app', 'Login'), 'url' => ['/site/login']];
+    } else {
+        // Проверяем права доступа
+        $canCreateSession = Yii::$app->user->can('createSession');
+        $canCreateReview = Yii::$app->user->can('createReview');
+        $canManageReviews = Yii::$app->user->can('manageReviews');
+        $canManageGames = Yii::$app->user->can('manageGames');
+
+        if ($canCreateSession) {
+            $menuItems[] = ['label' => Yii::t('app', 'Create Session'), 'url' => ['/game-sessions/create']];
+        }
+
+        if ($canManageReviews) {
+            $menuItems[] = ['label' => Yii::t('app', 'Admin'), 'url' => ['/admin/index']];
+        }
+
+        if ($canManageGames) {
+            $menuItems[] = ['label' => Yii::t('app', 'Games'), 'url' => ['/games/index']];
+        }
+
+        $menuItems[] = [
+                'label' => Yii::t('app', 'Hello, {username}!', ['username' => Yii::$app->user->identity->username]),
+                'items' => [
+                        '<div class="dropdown-divider"></div>',
+                        ['label' => Yii::t('app', 'Выход'), 'url' => ['/site/logout'], 'linkOptions' => ['data-method' => 'post']],
+                ],
+        ];
+    }
+
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
@@ -38,21 +70,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     ]);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
-        'items' => [
-            ['label' =>  Yii::t('app', 'Games'), 'url' => ['/games/index']],
-            ['label' =>  Yii::t('app', 'Game Sessions'), 'url' => ['/game-sessions/index']],
-            ['label' =>  Yii::t('app', 'Admin'), 'url' => ['/admin/index']],
-            Yii::$app->user->isGuest
-                ? ['label' => 'Login', 'url' => ['/site/login']]
-                : '<li class="nav-item">'
-                    . Html::beginForm(['/site/logout'])
-                    . Html::submitButton(
-                        'Logout (' . Yii::$app->user->identity->username . ')',
-                        ['class' => 'nav-link btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
-        ]
+            'items' => $menuItems,
     ]);
     NavBar::end();
     ?>

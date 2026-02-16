@@ -1,4 +1,7 @@
 <?php
+
+use app\components\RatingHelper;
+use app\models\Reviews;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap5\ActiveForm;
@@ -21,14 +24,16 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                        'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                        'method' => 'post',
-                ],
-        ]) ?>
+        <?php if (Yii::$app->user->can('manageGames')): ?>
+            <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
+                    'class' => 'btn btn-danger',
+                    'data' => [
+                            'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                            'method' => 'post',
+                    ],
+            ]) ?>
+        <?php endif; ?>
     </p>
 
     <?= DetailView::widget([
@@ -104,16 +109,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 
-    <?php if (!Yii::$app->user->isGuest): ?>
+    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->can('createReview')): ?>
         <div class="review-form mt-4 bg-light p-3 rounded">
             <h2><?= Yii::t('app', 'Leave a Review') ?></h2>
             <?php $form = ActiveForm::begin([
                     'fieldConfig' => ['errorOptions' => ['class' => 'invalid-feedback d-block']],
             ]); ?>
 
-            <?= $form->field($reviewForm, 'rating')->dropDownList([
-                    1 => '⭐', 2 => '⭐⭐', 3 => '⭐⭐⭐', 4 => '⭐⭐⭐⭐', 5 => '⭐⭐⭐⭐⭐'
-            ], ['prompt' => Yii::t('app', 'Choose rating...')]) ?>
+            <?= $form->field($reviewForm, 'rating')->dropDownList(RatingHelper::getRatingOptions(), ['prompt' => Yii::t('app', 'Choose rating...')]) ?>
 
             <?= $form->field($reviewForm, 'comment')->textarea(['rows' => 5]) ?>
             <?= $form->field($reviewForm, 'game_id')->hiddenInput()->label(false) ?>
@@ -123,5 +126,13 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <?php ActiveForm::end(); ?>
         </div>
+    <?php elseif (Yii::$app->user->isGuest): ?>
+        <p class="text-muted">
+            <?= Yii::t('app', 'To leave a review, please {login} or {signup}.', [
+                    'login' => Html::a(Yii::t('app', 'log in'), ['site/login']),
+                    'signup' => Html::a(Yii::t('app', 'register'), ['site/signup']),
+            ]) ?>
+        </p>
     <?php endif; ?>
+
 </div>
