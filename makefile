@@ -56,3 +56,9 @@ db: ## Войти в БД
 
 cache-clear: ##  Очистить кэш
 	docker compose exec php php yii cache/flush-all
+
+game-session-update: ##  Обновить статусы игровых сессий
+	docker compose exec php php yii session/update-status
+
+game-session-check: ##  Проверить статусы игровых сессий
+	docker compose exec php php yii session/check-stale

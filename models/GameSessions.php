@@ -211,4 +211,40 @@ class GameSessions extends ActiveRecord
         return false;
     }
 
+    /**
+     * Обновить статусы прошедших сессий
+     *
+     * - Запланированные сессии с прошедшей датой превращаем в активные
+     * - Активные сессии с прошедшей датой превращаем в завершённые
+     *
+     * @return int Количество обновлённых записей
+     */
+    public static function updateExpiredSessions(): int
+    {
+        $now = date('Y-m-d H:i:s');
+        $count = 0;
+
+        // Запланированные сессии делаем активными
+        $count += static::updateAll(
+            ['status' => self::STATUS_ACTIVE],
+            [
+                'and',
+                ['<=', 'scheduled_at', $now],
+                ['status' => self::STATUS_PLANNED],
+            ]
+        );
+
+        // Активные сессии, у которых дата уже прошла делаем завершёнными
+        $count += static::updateAll(
+            ['status' => self::STATUS_COMPLETED],
+            [
+                'and',
+                ['<', 'scheduled_at', $now],
+                ['status' => self::STATUS_ACTIVE],
+            ]
+        );
+
+        return $count;
+    }
+
 }

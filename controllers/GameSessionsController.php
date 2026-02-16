@@ -62,6 +62,11 @@ class GameSessionsController extends Controller
      */
     public function actionIndex()
     {
+        // Для тестирования обновляем статусы при открытии списка, на проде это должно происходить через крон
+        if (YII_ENV === 'dev') {
+            GameSessions::updateExpiredSessions();
+        }
+
         $searchModel = new SearchGameSessions();
         $dataProvider = $searchModel->search($this->request->queryParams);
 

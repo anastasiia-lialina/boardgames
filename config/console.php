@@ -38,6 +38,7 @@ $config = [
     'controllerMap' => [
         'rbac' => 'app\commands\RbacController',
         'seed' => 'app\commands\SeedController',
+        'session' => 'app\commands\SessionController',
     ],
 
 ];
