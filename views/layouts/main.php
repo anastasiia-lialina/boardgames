@@ -63,17 +63,17 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         ];
     }
 
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
-    ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-            'items' => $menuItems,
-    ]);
-    NavBar::end();
-    ?>
+NavBar::begin([
+    'brandLabel' => Yii::$app->name,
+    'brandUrl' => Yii::$app->homeUrl,
+    'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top'],
+]);
+echo Nav::widget([
+    'options' => ['class' => 'navbar-nav'],
+        'items' => $menuItems,
+]);
+NavBar::end();
+?>
 </header>
 
 <main id="main" class="flex-shrink-0" role="main">

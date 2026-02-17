@@ -3,7 +3,6 @@
 namespace app\models\game;
 
 use app\models\user\Review;
-use DateTime;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\data\ActiveDataProvider;
@@ -29,12 +28,12 @@ use yii\db\Expression;
  */
 class Game extends ActiveRecord
 {
-    const MIN_PLAYERS = 1;
-    const MAX_PLAYERS = 20;
-    const MIN_DURATION = 5;
-    const MIN_COMPLEXITY = 1.0;
-    const MAX_COMPLEXITY = 5.0;
-    const MIN_YEAR = 1900;
+    public const MIN_PLAYERS = 1;
+    public const MAX_PLAYERS = 20;
+    public const MIN_DURATION = 5;
+    public const MIN_COMPLEXITY = 1.0;
+    public const MAX_COMPLEXITY = 5.0;
+    public const MIN_YEAR = 1900;
 
     /**
      * {@inheritdoc}
@@ -124,16 +123,6 @@ class Game extends ActiveRecord
     }
 
     /**
-     * Получить все одобренные отзывы
-     */
-    public function getApprovedReviews(): ActiveQuery
-    {
-        return $this->hasMany(Review::class, ['game_id' => 'id'])
-            ->where(['is_approved' => true])
-            ->orderBy(['created_at' => SORT_DESC]);
-    }
-
-    /**
      * Получить все отзывы
      */
     public function getReviews(): ActiveQuery
@@ -161,8 +150,8 @@ class Game extends ActiveRecord
     }
 
     /**
-    * Получить список одобренных отзывов отсортированный и с пагинацией
-    */
+     * Получить список одобренных отзывов отсортированный и с пагинацией
+     */
     public function getReviewsDataProvider($pageSize = 2): ActiveDataProvider
     {
         return new ActiveDataProvider([
@@ -176,5 +165,15 @@ class Game extends ActiveRecord
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Получить все одобренные отзывы
+     */
+    public function getApprovedReviews(): ActiveQuery
+    {
+        return $this->hasMany(Review::class, ['game_id' => 'id'])
+            ->where(['is_approved' => true])
+            ->orderBy(['created_at' => SORT_DESC]);
     }
 }

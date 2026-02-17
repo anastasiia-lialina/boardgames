@@ -14,7 +14,7 @@ use yii\helpers\Html;
         'action' => ['index'],
         'method' => 'get',
         'options' => [
-            'data-pjax' => 1
+            'data-pjax' => 1,
         ],
     ]); ?>
 
@@ -28,13 +28,13 @@ use yii\helpers\Html;
 
     <?= $form->field($model, 'players_max') ?>
 
-    <?php // echo $form->field($model, 'duration_min') ?>
+    <?php // echo $form->field($model, 'duration_min')?>
 
-    <?php // echo $form->field($model, 'complexity') ?>
+    <?php // echo $form->field($model, 'complexity')?>
 
-    <?php // echo $form->field($model, 'year') ?>
+    <?php // echo $form->field($model, 'year')?>
 
-    <?php // echo $form->field($model, 'created_at') ?>
+    <?php // echo $form->field($model, 'created_at')?>
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>

@@ -8,6 +8,8 @@ use DateTime;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -25,14 +27,80 @@ use yii\helpers\ArrayHelper;
  */
 class GameSession extends ActiveRecord
 {
+    public const STATUS_PLANNED = 'planned';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_CANCELLED = 'cancelled';
 
-    const STATUS_PLANNED = 'planned';
-    const STATUS_ACTIVE = 'active';
-    const STATUS_COMPLETED = 'completed';
-    const STATUS_CANCELLED = 'cancelled';
+    public const MIN_PARTICIPANTS = 2;
+    public const MAX_PARTICIPANTS = 20;
 
-    const MIN_PARTICIPANTS = 2;
-    const MAX_PARTICIPANTS = 20;
+    /**
+     * Получить все сессии по статусу
+     */
+    public static function findByStatus($status): ActiveQuery
+    {
+        return static::find()
+            ->where(['status' => $status])
+            ->orderBy(['scheduled_at' => SORT_DESC]);
+    }
+
+    /**
+     * Поиск количества просроченных сессий
+     */
+    public static function findStalePlannedCount(): int
+    {
+        return (int)self::find()->where(self::getStaleCondition())->count();
+    }
+
+    /**
+     * Условие для поиска просроченных сессий
+     */
+    private static function getStaleCondition(): array
+    {
+        return [
+            'and',
+            ['status' => self::STATUS_PLANNED],
+            ['<', 'scheduled_at', date('Y-m-d 00:00:00')],
+        ];
+    }
+
+    /**
+     * Отменяет запланированные сессии, которые должны были начаться до сегодняшнего дня
+     *
+     * @return int Количество обновлённых записей
+     */
+    public static function updateExpiredSessions(): int
+    {
+        $db = self::getDb();
+        $condition = self::getStaleCondition();
+        $now = date('Y-m-d H:i:s');
+
+
+        return $db->transaction(function ($db) use ($condition, $now) {
+
+            // Берем данные для вставки в лог
+            $dataToLog = (new Query())
+                ->select([
+                    'session_id' => 'id',              // берем ID из game_session
+                    'old_status' => 'status',          // берем текущий статус
+                    'new_status' => new Expression(':new', [':new' => self::STATUS_CANCELLED]),
+                    'changed_at' => new Expression(':time', [':time' => $now]),
+                ])
+                ->from(self::tableName())
+                ->where($condition);
+
+            // Копируем данные о сессии в лог
+            $db->createCommand()
+                ->insert('game_session_log', $dataToLog)
+                ->execute();
+
+            // Обновляем записи сессии
+            return $db->createCommand()
+                ->update(self::tableName(), ['status' => self::STATUS_CANCELLED], $condition)
+                ->execute();
+        });
+    }
 
     /**
      * {@inheritdoc}
@@ -60,7 +128,7 @@ class GameSession extends ActiveRecord
                 self::STATUS_PLANNED,
                 self::STATUS_ACTIVE,
                 self::STATUS_COMPLETED,
-                self::STATUS_CANCELLED
+                self::STATUS_CANCELLED,
             ]],
 
             ['status', 'validateStatus'],
@@ -109,7 +177,7 @@ class GameSession extends ActiveRecord
                 self::STATUS_PLANNED,
                 self::STATUS_ACTIVE,
                 self::STATUS_COMPLETED,
-                self::STATUS_CANCELLED
+                self::STATUS_CANCELLED,
             ];
 
             if (!in_array($this->status, $allowedStatuses)) {
@@ -126,8 +194,8 @@ class GameSession extends ActiveRecord
         if (!$this->scheduled_at) {
             return;
         }
-        $scheduled = new \DateTime($this->scheduled_at);
-        $now = new \DateTime();
+        $scheduled = new DateTime($this->scheduled_at);
+        $now = new DateTime();
 
         switch ($this->status) {
             case self::STATUS_PLANNED:
@@ -172,14 +240,9 @@ class GameSession extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'organizer_id']);
     }
 
-    /**
-     * Получить все сессии по статусу
-     */
-    public static function findByStatus($status): ActiveQuery
+    public function getStatusLabel()
     {
-        return static::find()
-            ->where(['status' => $status])
-            ->orderBy(['scheduled_at' => SORT_DESC]);
+        return ArrayHelper::getValue($this->getStatusLabels(), $this->status);
     }
 
     public function getStatusLabels(): array
@@ -190,11 +253,6 @@ class GameSession extends ActiveRecord
             self::STATUS_COMPLETED => Yii::t('app', 'Completed'),
             self::STATUS_CANCELLED => Yii::t('app', 'Cancelled'),
         ];
-    }
-
-    public function getStatusLabel()
-    {
-        return ArrayHelper::getValue($this->getStatusLabels(), $this->status);
     }
 
     public function beforeSave($insert)
@@ -209,62 +267,5 @@ class GameSession extends ActiveRecord
             return true;
         }
         return false;
-    }
-
-    /**
-     * Условие для поиска просроченных сессий
-     */
-    private static function getStaleCondition(): array
-    {
-        return [
-            'and',
-            ['status' => self::STATUS_PLANNED],
-            ['<', 'scheduled_at', date('Y-m-d 00:00:00')]
-        ];
-    }
-
-    /**
-     * Поиск количества просроченных сессий
-     */
-    public static function findStalePlannedCount(): int
-    {
-        return (int) self::find()->where(self::getStaleCondition())->count();
-    }
-
-    /**
-     * Отменяет запланированные сессии, которые должны были начаться до сегодняшнего дня
-     *
-     * @return int Количество обновлённых записей
-     */
-    public static function updateExpiredSessions(): int
-    {
-        $db = self::getDb();
-        $condition = self::getStaleCondition();
-        $now = date('Y-m-d H:i:s');
-
-
-        return $db->transaction(function ($db) use ($condition, $now) {
-
-            // Берем данные для вставки в лог
-            $dataToLog = (new \yii\db\Query())
-                ->select([
-                    'session_id' => 'id',              // берем ID из game_session
-                    'old_status' => 'status',          // берем текущий статус
-                    'new_status' => new \yii\db\Expression(':new', [':new' => self::STATUS_CANCELLED]),
-                    'changed_at' => new \yii\db\Expression(':time', [':time' => $now]),
-                ])
-                ->from(self::tableName())
-                ->where($condition);
-
-            // Копируем данные о сессии в лог
-            $db->createCommand()
-                ->insert('game_session_log', $dataToLog)
-                ->execute();
-
-            // Обновляем записи сессии
-            return $db->createCommand()
-                ->update(self::tableName(), ['status' => self::STATUS_CANCELLED], $condition)
-                ->execute();
-        });
     }
 }

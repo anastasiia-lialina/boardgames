@@ -42,6 +42,7 @@ class GameSessionsController extends Controller
                         'matchCallback' => function ($rule, $action) {
                             $model = $this->findModel(Yii::$app->request->get('id'));
                             // Проверяем: пользователь является ли организатором или имеет право управлять всеми сессиями
+                            //TODO добавить правило для разрешения редактирования своих сессий
                             return $model->organizer_id == Yii::$app->user->id || Yii::$app->user->can('manageSessions');
                         },
                     ],

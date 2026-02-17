@@ -21,7 +21,7 @@ class m260209_104003_create_reviews_table extends Migration
             'is_approved' => $this->boolean()->notNull()->defaultValue(false)->comment('Статус модерации'),
             'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Дата добавления'),
         ]);
-        $this->addCommentOnTable('{{%reviews}}','Отзывы');
+        $this->addCommentOnTable('{{%reviews}}', 'Отзывы');
 
         // Внешние ключи
         $this->addForeignKey(

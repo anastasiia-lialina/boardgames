@@ -1,8 +1,8 @@
 <?php
 
 use app\models\game\Game;
-use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
+use yii\helpers\Html;
 
 /** @var yii\web\View $this */
 /** @var app\models\game\Game $model */

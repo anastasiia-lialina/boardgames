@@ -2,8 +2,8 @@
 
 namespace app\commands;
 
-use app\models\game\GameSession;
 use app\models\game\Game;
+use app\models\game\GameSession;
 use app\models\user\Review;
 use app\models\user\User;
 use Yii;
@@ -274,7 +274,8 @@ class SeedController extends Controller
             $session = new GameSession();
             $session->game_id = $game->id;
             $session->organizer_id = $userIds[array_rand($userIds)];
-            $session->scheduled_at = (new \DateTime())->modify('+5 days')->format('d.m.Y H:i');;
+            $session->scheduled_at = (new \DateTime())->modify('+5 days')->format('d.m.Y H:i');
+            ;
             $session->max_participants = rand(3, 8);
             $session->status = GameSession::STATUS_PLANNED;
 
@@ -324,6 +325,8 @@ class SeedController extends Controller
             User::find()
                 ->select('id')
                 ->asArray()
-                ->all(), 'id');
+                ->all(),
+            'id'
+        );
     }
 }

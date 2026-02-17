@@ -4,8 +4,8 @@ namespace app\controllers;
 
 use app\models\game\Game;
 use app\models\search\GameSearch;
-use app\models\search\ReviewSearch;
 use app\models\search\GameSessionSearch;
+use app\models\search\ReviewSearch;
 use app\models\user\Review;
 use Yii;
 use yii\db\Exception;
@@ -89,7 +89,7 @@ class GamesController extends Controller
         if ($reviewForm->load(Yii::$app->request->post())) {
             $reviewForm->user_id = Yii::$app->user->id;
             if ($reviewForm->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app','Отзыв отправлен на модерацию!'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Отзыв отправлен на модерацию!'));
                 $this->refresh();
             }
         }

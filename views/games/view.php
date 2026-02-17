@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'label' => Yii::t('app', 'Players'),
                             'value' => Yii::t('app', '{min}–{max} players', [
                                     'min' => $model->players_min,
-                                    'max' => $model->players_max
+                                    'max' => $model->players_max,
                             ]),
                     ],
                     [

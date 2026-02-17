@@ -24,10 +24,9 @@ use yii\db\Expression;
  */
 class Review extends ActiveRecord
 {
-
-    const MIN_RATING = 1;
-    const MAX_RATING = 5;
-    const MAX_COMMENT_LENGTH = 1000;
+    public const MIN_RATING = 1;
+    public const MAX_RATING = 5;
+    public const MAX_COMMENT_LENGTH = 1000;
 
     /**
      * {@inheritdoc}
@@ -49,7 +48,7 @@ class Review extends ActiveRecord
                 'class' => BlameableBehavior::class,
                 'updatedByAttribute' => false,
                 'createdByAttribute' => 'user_id',
-            ]
+            ],
         ];
     }
 
@@ -76,7 +75,7 @@ class Review extends ActiveRecord
                 ['user_id', 'game_id'],
                 'unique',
                 'targetAttribute' => ['user_id', 'game_id'],
-                'message' => Yii::t('app', 'You have already left a review for this game.')
+                'message' => Yii::t('app', 'You have already left a review for this game.'),
             ],
 
             [['game_id'], 'exist', 'skipOnError' => true, 'targetClass' => Game::class, 'targetAttribute' => ['game_id' => 'id']],

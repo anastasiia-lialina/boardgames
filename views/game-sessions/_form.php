@@ -20,8 +20,8 @@ use yii\helpers\Html;
     ]); ?>
 
     <?= $form->field($model, 'game_id')->dropDownList(
-            ArrayHelper::map(Game::find()->orderBy('title')->all(), 'id', 'title'),
-            ['prompt' => Yii::t('app', 'Select game...')]
+        ArrayHelper::map(Game::find()->orderBy('title')->all(), 'id', 'title'),
+        ['prompt' => Yii::t('app', 'Select game...')]
     ) ?>
 
     <?= $form->field($model, 'scheduled_at')->widget(DateTimePicker::class, [
@@ -48,7 +48,7 @@ use yii\helpers\Html;
     <?= $form->field($model, 'max_participants')->textInput([
             'type' => 'number',
             'min' => 2,
-            'max' => 20
+            'max' => 20,
     ]) ?>
     <?php if (!$model->isNewRecord):?>
         <?= $form->field($model, 'status')->dropDownList($model->getStatusLabels()) ?>

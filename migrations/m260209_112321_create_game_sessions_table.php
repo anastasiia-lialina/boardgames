@@ -21,7 +21,7 @@ class m260209_112321_create_game_sessions_table extends Migration
             'status' => $this->string(20)->notNull()->defaultValue('planned')->comment('Статус сессии'),
             'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Дата добавления'),
         ]);
-        $this->addCommentOnTable('{{%game_sessions}}','Игровые встречи');
+        $this->addCommentOnTable('{{%game_sessions}}', 'Игровые встречи');
 
 
         $this->addForeignKey(

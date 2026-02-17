@@ -48,7 +48,7 @@ class ReviewSearch extends Review
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' =>  20,
+                'pageSize' => 20,
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -69,7 +69,7 @@ class ReviewSearch extends Review
                         'asc' => ['user.username' => SORT_ASC],
                         'desc' => ['user.username' => SORT_DESC],
                     ],
-                ]
+                ],
             ],
         ]);
 

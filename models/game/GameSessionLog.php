@@ -3,6 +3,7 @@
 namespace app\models\game;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "game_session_log".
@@ -13,10 +14,8 @@ use Yii;
  * @property string|null $new_status
  * @property string $changed_at
  */
-class GameSessionLog extends \yii\db\ActiveRecord
+class GameSessionLog extends ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

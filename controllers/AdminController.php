@@ -62,10 +62,10 @@ class AdminController extends Controller
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Отзыв одобрен!'));
             } else {
-                Yii::$app->session->setFlash('error',  Yii::t('app','Ошибка при одобрении отзыва.'));
+                Yii::$app->session->setFlash('error', Yii::t('app', 'Ошибка при одобрении отзыва.'));
             }
         } else {
-            Yii::$app->session->setFlash('error',  Yii::t('app','Отзыв не найден.'));
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Отзыв не найден.'));
         }
 
         return $this->redirect(['index']);
@@ -79,9 +79,9 @@ class AdminController extends Controller
         $model = Review::findOne($id);
 
         if ($model && $model->delete()) {
-            Yii::$app->session->setFlash('success',  Yii::t('app','Отзыв отклонён!'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Отзыв отклонён!'));
         } else {
-            Yii::$app->session->setFlash('error',  Yii::t('app','Ошибка при отклонении отзыва.'));
+            Yii::$app->session->setFlash('error', Yii::t('app', 'Ошибка при отклонении отзыва.'));
         }
 
         return $this->redirect(['index']);

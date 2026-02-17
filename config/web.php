@@ -12,7 +12,7 @@ $config = [
     'language' => 'ru-RU',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
     ],
     'components' => [
         'formatter' => [
@@ -73,7 +73,7 @@ $config = [
                     'basePath' => '@app/messages',
                     'sourceLanguage' => 'en-US',
                     'fileMap' => [
-                        'app'       => 'app.php',
+                        'app' => 'app.php',
                     ],
                 ],
             ],

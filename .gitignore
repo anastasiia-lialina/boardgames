@@ -36,3 +36,5 @@ composer.phar
 
 # Database
 *.sql
+
+.php-cs-fixer.cache

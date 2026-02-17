@@ -14,7 +14,7 @@ use yii\helpers\Html;
         'action' => ['index'],
         'method' => 'get',
         'options' => [
-            'data-pjax' => 1
+            'data-pjax' => 1,
         ],
     ]); ?>
 
@@ -28,9 +28,9 @@ use yii\helpers\Html;
 
     <?= $form->field($model, 'comment') ?>
 
-    <?php // echo $form->field($model, 'is_approved')->checkbox() ?>
+    <?php // echo $form->field($model, 'is_approved')->checkbox()?>
 
-    <?php // echo $form->field($model, 'created_at') ?>
+    <?php // echo $form->field($model, 'created_at')?>
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>

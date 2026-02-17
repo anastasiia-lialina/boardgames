@@ -23,7 +23,7 @@ class m260209_103342_create_games_table extends Migration
             'year' => $this->integer()->notNull()->comment('Год выпуска'),
             'created_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Дата добавления'),
         ]);
-        $this->addCommentOnTable('{{%games}}','Настольные игры');
+        $this->addCommentOnTable('{{%games}}', 'Настольные игры');
 
         $this->createIndex('idx_games_players', '{{%games}}', ['players_min', 'players_max']);
         $this->createIndex('idx_games_complexity', '{{%games}}', 'complexity');

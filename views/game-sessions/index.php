@@ -43,22 +43,23 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'status',
                             'value' => function ($model) {
                                 $classMap = [
-                                        GameSession::STATUS_PLANNED => 'label-info',
-                                        GameSession::STATUS_ACTIVE => 'label-primary',
-                                        GameSession::STATUS_COMPLETED => 'label-success',
-                                        GameSession::STATUS_CANCELLED => 'label-danger',
+                                        GameSession::STATUS_PLANNED => 'bg-info text-dark',
+                                        GameSession::STATUS_ACTIVE => 'bg-primary',
+                                        GameSession::STATUS_COMPLETED => 'bg-success',
+                                        GameSession::STATUS_CANCELLED => 'bg-danger',
                                 ];
-                                $class = $classMap[$model->status] ?? 'label-default';
-                                return Html::tag('span', $model->statusLabel, ['class' => "label $class"]);
+
+                                $class = $classMap[$model->status] ?? 'bg-secondary';
+
+                                return Html::tag('span', $model->statusLabel, ['class' => "badge $class"]);
                             },
+
                             'format' => 'raw',
                             'filter' => function ($model) {
                                 return $model->getStatusLabels();
 
                             },
                     ],
-                    'created_at:datetime',
-
                     [
                             'class' => 'yii\grid\ActionColumn',
                     ],
