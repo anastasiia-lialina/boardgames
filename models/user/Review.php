@@ -28,6 +28,9 @@ class Review extends ActiveRecord
     public const MAX_RATING = 5;
     public const MAX_COMMENT_LENGTH = 1000;
 
+    const STATUS_APPROVED = 'approved';
+    const STATUS_REJECTED = 'rejected';
+
     /**
      * {@inheritdoc}
      */

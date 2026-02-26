@@ -11,7 +11,7 @@ use yii\helpers\Html;
         <p><?= Yii::t('app', 'Max Participants') ?>: <?= $model->max_participants ?></p>
         <p><?= Yii::t('app', 'Status') ?>: <?= Html::encode($model->statusLabel) ?></p>
         <p>
-            <?= Html::a('Подробнее', ['game-sessions/view', 'id' => $model->id], ['class' => 'btn btn-primary btn-sm']) ?>
+            <?= Html::a('Подробнее', ['game-session/view', 'id' => $model->id], ['class' => 'btn btn-primary btn-sm']) ?>
         </p>
     </div>
 </div>

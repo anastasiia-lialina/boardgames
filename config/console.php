@@ -6,12 +6,23 @@ $db = require __DIR__ . '/db.php';
 $config = [
     'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'queue'],
     'controllerNamespace' => 'app\commands',
+    'language' => 'ru-RU',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
         '@tests' => '@app/tests',
+    ],
+    'modules' => [
+        'notifications' => [
+            'class' => 'webzop\notifications\Module',
+            'channels' => [
+                'screen' => [
+                    'class' => 'webzop\notifications\channels\ScreenChannel',
+                ],
+            ],
+        ],
     ],
     'components' => [
         'formatter' => [
@@ -27,11 +38,34 @@ $config = [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['info', 'error', 'warning'],
+                    'categories' => ['queue', 'yii\queue\*'],
+                    'logFile' => '@runtime/logs/queue.log',
+                    'logVars' => [],
+                    'maxFileSize' => 10240,
+                    'maxLogFiles' => 5,
+                ],
+
             ],
         ],
         'db' => $db,
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
+        ],
+        'queue' => [
+            'class' => \yii\queue\amqp_interop\Queue::class,
+            'host' => getenv('RABBITMQ_HOST'),
+            'port' => getenv('RABBITMQ_PORT'),
+            'user' => getenv('RABBITMQ_USER'),
+            'password' => getenv('RABBITMQ_PASS'),
+            'vhost' => getenv('RABBITMQ_VHOST'),
+            'queueName' => 'notifications',
+            'exchangeName' => 'notifications_exchange',
+            'routingKey' => 'notifications',
+            'driver' => \yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
+            'as log' => \yii\queue\LogBehavior::class,
         ],
     ],
     'params' => $params,

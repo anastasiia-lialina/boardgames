@@ -13,7 +13,7 @@ use yii\web\NotFoundHttpException;
 /**
  * GameSessionController implements the CRUD actions for GameSession model.
  */
-class GameSessionsController extends Controller
+class GameSessionController extends Controller
 {
     /**
      * @inheritDoc

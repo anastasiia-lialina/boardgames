@@ -3,7 +3,9 @@
 namespace app\models\game;
 
 use app\behaviors\StatusLogBehavior;
+use app\jobs\SendGameNotificationJob;
 use app\models\user\User;
+use app\notifications\SessionNotification;
 use DateTime;
 use Yii;
 use yii\db\ActiveQuery;
@@ -267,5 +269,20 @@ class GameSession extends ActiveRecord
             return true;
         }
         return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        Yii::$app->queue->push(new SendGameNotificationJob([
+            'sessionId' => $this->id,
+            'gameId' => $this->game_id,
+            'statusLabel' => $this->statusLabel,
+            'sessionDate' => $this->scheduled_at,
+        ]));
     }
 }

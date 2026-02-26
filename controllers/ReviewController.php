@@ -11,9 +11,9 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 /**
- * ReviewsController implements the CRUD actions for Review model.
+ * ReviewController implements the CRUD actions for Review model.
  */
-class ReviewsController extends Controller
+class ReviewController extends Controller
 {
     /**
      * @inheritDoc

@@ -18,7 +18,7 @@ use yii\web\Response;
 /**
  * GameController implements the CRUD actions for Game model.
  */
-class GamesController extends Controller
+class GameController extends Controller
 {
     /**
      * @inheritDoc

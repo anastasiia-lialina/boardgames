@@ -1,6 +1,7 @@
 <?php
 
 use app\components\RatingHelper;
+use app\models\game\GameSubscription;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
@@ -34,6 +35,26 @@ $this->params['breadcrumbs'][] = $this->title;
             ]) ?>
         <?php endif; ?>
     </p>
+    <? if (!Yii::$app->user->isGuest): ?>
+            <?php $isSubscribed = GameSubscription::isSubscribed(Yii::$app->user->id, $model->id) ?>
+
+            <?= Html::beginForm(['/game-subscription/' . ($isSubscribed ? 'unsubscribe' : 'subscribe')], 'post', ['class' => 'd-inline-block mb-3']);?>
+            <?= Html::hiddenInput('gameId', $model->id) ?>
+
+            <? if ($isSubscribed): ?>
+                <?= Html::submitButton(
+                        '<i class="bi bi-bell-slash"></i> ' . Yii::t('app', 'Unsubscribe'),
+                        ['class' => 'btn btn-outline-secondary']
+                );?>
+            <? else: ?>
+                <?= Html::submitButton(
+                        '<i class="bi bi-bell"></i> ' . Yii::t('app', 'Subscribe'),
+                        ['class' => 'btn btn-primary']
+                );?>
+            <? endif; ?>
+
+            <?= Html::endForm();?>
+    <? endif; ?>
 
     <?= DetailView::widget([
             'model' => $model,

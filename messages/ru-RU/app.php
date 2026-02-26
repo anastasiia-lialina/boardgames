@@ -71,4 +71,12 @@ return [
     'log in' => 'войдите',
     'register' => 'зарегистрируйтесь',
     'To leave a review, please {login} or {signup}.' => 'Чтобы оставить отзыв, пожалуйста, {login} или {signup}.',
+    'Your review for "{game}" has been approved and published' => 'Ваш отзыв к игре "{game}" одобрен и опубликован',
+    'Your review for "{game}" was rejected by a moderator' => 'Ваш отзыв к игре "{game}" отклонён модератором',
+    'Game "{game}": session on {date} has been {status}' => 'Игра «{game}»: сессия на {date} статус - {status}',
+    'Thank you for registering! You can now log in.' => 'Спасибо за регистрацию! Теперь вы можете войти.',
+    'Subscribe' => 'Подписаться',
+    'Unsubscribe' => 'Отписаться',
+    'You have subscribed to the game "{game}".' => 'Вы подписались на игру "{game}".',
+    'You have unsubscribed from the "{game}".' => 'Вы отписались от игры "{game}".',
 ];

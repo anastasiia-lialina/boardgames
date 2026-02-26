@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'gameTitle',
                             'label' => Yii::t('app', 'Game'),
                             'value' => function ($model) {
-                                return Html::a($model->game->title, ['games/view', 'id' => $model->game_id], ['target' => '_blank']);
+                                return Html::a($model->game->title, ['game/view', 'id' => $model->game_id], ['target' => '_blank']);
                             },
                             'format' => 'raw',
                     ],
@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         ]);
                                     },
                                     'view' => function ($url, $model) {
-                                        return Html::a(Yii::t('app', 'View'), ['reviews/view', 'id' => $model->id], [
+                                        return Html::a(Yii::t('app', 'View'), ['review/view', 'id' => $model->id], [
                                                 'class' => 'btn btn-info btn-sm',
                                                 'target' => '_blank',
                                         ]);

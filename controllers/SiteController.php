@@ -112,8 +112,7 @@ class SiteController extends Controller
     {
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post()) && $model->signup()) {
-            //TODO translate
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Спасибо за регистрацию! Теперь вы можете войти.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Thank you for registering! You can now log in.'));
             return $this->redirect(['login']);
         }
 

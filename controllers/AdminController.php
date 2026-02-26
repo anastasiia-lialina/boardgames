@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\jobs\SendReviewNotificationJob;
 use app\models\search\ReviewSearch;
 use app\models\user\Review;
 use Yii;
@@ -41,7 +42,7 @@ class AdminController extends Controller
         $searchModel = new ReviewSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        $dataProvider->query->andWhere(['is_approved' => false]);//TODO replace to Reviews
+        $dataProvider->query->andWhere(['is_approved' => false]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -60,6 +61,15 @@ class AdminController extends Controller
             $model->is_approved = true;
 
             if ($model->save()) {
+
+                // Отправляем уведомление
+                Yii::$app->queue->push(new SendReviewNotificationJob([
+                    'userId'   => $model->user_id,
+                    'gameId'   => $model->game_id,
+                    'gameName' => $model->game->title,
+                    'isApproved'   => true,
+                ]));
+
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Отзыв одобрен!'));
             } else {
                 Yii::$app->session->setFlash('error', Yii::t('app', 'Ошибка при одобрении отзыва.'));
@@ -79,6 +89,14 @@ class AdminController extends Controller
         $model = Review::findOne($id);
 
         if ($model && $model->delete()) {
+            // Отправляем уведомление
+            Yii::$app->queue->push(new SendReviewNotificationJob([
+                'userId'   => $model->user_id,
+                'gameId'   => $model->game_id,
+                'gameName' => $model->game->title,
+                'isApproved'   => false,
+            ]));
+
             Yii::$app->session->setFlash('success', Yii::t('app', 'Отзыв отклонён!'));
         } else {
             Yii::$app->session->setFlash('error', Yii::t('app', 'Ошибка при отклонении отзыва.'));

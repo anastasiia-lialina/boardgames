@@ -2,6 +2,7 @@ FROM php:8.2-fpm-alpine
 
 # Установка системных зависимостей
 RUN apk add --no-cache --update \
+    linux-headers \
     build-base \
     autoconf \
     postgresql-dev \
@@ -26,14 +27,14 @@ RUN apk add --no-cache --update \
         mbstring \
         zip \
         gd \
+        sockets \
         intl \
         opcache && \
     # Установка Redis
     pecl install redis-6.0.2 && \
     docker-php-ext-enable redis && \
     # Очистка кэша пакетов
-    apk del --no-cache build-base autoconf postgresql-dev libzip-dev zlib-dev \
-        libpng-dev libjpeg-turbo-dev freetype-dev libxml2-dev icu-dev oniguruma-dev
+    apk del --no-cache build-base autoconf linux-headers
 
 # Установка Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -46,7 +47,7 @@ RUN mkdir -p /app/runtime /app/web/assets && \
 # Рабочая директория
 WORKDIR /app
 
-# Запуск от пользователя www-data (безопаснее, чем от root)
+# Запуск от пользователя www-data
 USER www-data
 
 CMD ["php-fpm"]

@@ -4,6 +4,9 @@ namespace app\components;
 
 use yii\helpers\Html;
 
+/**
+ * Класс для работы с рейтингом (отображение рейтинга в виде звёздочек)
+ */
 class RatingHelper
 {
     public static function getStars(float|int $rating, int $max = 5): array
