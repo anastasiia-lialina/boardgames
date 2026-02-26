@@ -54,6 +54,27 @@ $config = [
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],
+        'i18n' => [
+            'translations' => [
+                'app*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en-US',
+                    'fileMap' => [
+                        'app' => 'app.php',
+                    ],
+                ],
+                'modules/notifications' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en-US',
+                    'forceTranslation' => true,
+                    'fileMap' => [
+                        'modules/notifications' => 'notifications.php',
+                    ],
+                ],
+            ],
+        ],
         'queue' => [
             'class' => \yii\queue\amqp_interop\Queue::class,
             'host' => getenv('RABBITMQ_HOST'),
