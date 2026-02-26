@@ -199,32 +199,27 @@ class GameSession extends ActiveRecord
         $scheduled = new DateTime($this->scheduled_at);
         $now = new DateTime();
 
-        switch ($this->status) {
-            case self::STATUS_PLANNED:
-                // Запланированная сессия
+        match ($this->status) {
+            self::STATUS_PLANNED, null => (function() use ($scheduled, $now, $attribute) {
                 if ($scheduled <= $now) {
                     $this->addError($attribute, Yii::t('app', 'The scheduled date must be in the future.'));
                 }
-                break;
+            })(),
 
-            case self::STATUS_ACTIVE:
-                // сессия уже началась
+            self::STATUS_ACTIVE => (function() use ($scheduled, $now, $attribute) {
                 if ($scheduled > $now) {
                     $this->addError($attribute, Yii::t('app', 'An active session must have already started.'));
                 }
-                break;
+            })(),
 
-            case self::STATUS_COMPLETED:
-                // сессия уже закончилась
+            self::STATUS_COMPLETED => (function() use ($scheduled, $now, $attribute) {
                 if ($scheduled >= $now) {
                     $this->addError($attribute, Yii::t('app', 'A completed session must be in the past.'));
                 }
-                break;
+            })(),
 
-            case self::STATUS_CANCELLED:
-                // дата может быть любой
-                break;
-        }
+            default => null, // Для STATUS_CANCELLED и прочих ничего не делаем
+        };
     }
 
     /**
