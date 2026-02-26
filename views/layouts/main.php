@@ -43,6 +43,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         $canManageReviews = Yii::$app->user->can('manageReviews');
         $canManageGames = Yii::$app->user->can('manageGames');
 
+        $menuItems[] = ['label' => Yii::t('app', 'Games'), 'url' => ['/game/index']];
+
         if ($canCreateSession) {
             $menuItems[] = ['label' => Yii::t('app', 'Create Session'), 'url' => ['/game-session/create']];
         }
