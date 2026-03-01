@@ -38,11 +38,7 @@ class ReviewController extends Controller
                     [
                         'allow' => true,
                         'actions' => ['update', 'delete'],
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            $model = $this->findModel(Yii::$app->request->get('id'));
-                            return $model->user_id == Yii::$app->user->id;
-                        },
+                        'permissions' => ['manageReviews'],
                     ],
                 ],
             ],
@@ -98,7 +94,7 @@ class ReviewController extends Controller
                 $model->user_id = Yii::$app->user->id;
 
                 if ($model->save()) {
-                    Yii::$app->session->setFlash('success', Yii::t('app', 'Отзыв отправлен на модерацию!'));
+                    Yii::$app->session->setFlash('success', Yii::t('app', 'Review sent for moderation!'));
                     return $this->redirect(['game/view', 'id' => $model->game_id]);
                 }
             }

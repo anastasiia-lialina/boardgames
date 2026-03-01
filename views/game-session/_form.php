@@ -26,7 +26,7 @@ use yii\helpers\Html;
 
     <?= $form->field($model, 'scheduled_at')->widget(DateTimePicker::class, [
             'options' => [
-                    'placeholder' => Yii::t('app', 'Выберите дату и время...'),
+                    'placeholder' => Yii::t('app', 'Select date and time...'),
                     'autocomplete' => 'off',
                     'value' => $model->scheduled_at
                             ? Yii::$app->formatter->asDatetime($model->scheduled_at, 'php:d.m.Y H:i')

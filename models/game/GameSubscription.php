@@ -62,7 +62,7 @@ class GameSubscription extends ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'User'),
             'game_id' => Yii::t('app', 'Game'),
-            'created_at' => Yii::t('app', 'Date'),
+            'created_at' => Yii::t('app', 'Created At'),
             'is_active' => Yii::t('app', 'Status'),
             'game.title' => Yii::t('app', 'Game'),
         ];

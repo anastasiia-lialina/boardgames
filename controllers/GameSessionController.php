@@ -38,12 +38,9 @@ class GameSessionController extends Controller
                     [
                         'allow' => true,
                         'actions' => ['update', 'delete'],
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            $model = $this->findModel(Yii::$app->request->get('id'));
-                            // Проверяем: пользователь является ли организатором или имеет право управлять всеми сессиями
-                            //TODO добавить правило для разрешения редактирования своих сессий
-                            return $model->organizer_id == Yii::$app->user->id || Yii::$app->user->can('manageSessions');
+                        'roles' => ['updateSession'],
+                        'roleParams' => function($rule) {
+                            return ['model' => $this->findModel(Yii::$app->request->get('id'))];
                         },
                     ],
                 ],
@@ -69,6 +66,7 @@ class GameSessionController extends Controller
         }
 
         $searchModel = new GameSessionSearch();
+
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -104,7 +102,7 @@ class GameSessionController extends Controller
                 $model->organizer_id = Yii::$app->user->id;
 
                 if ($model->save()) {
-                    Yii::$app->session->setFlash('success', 'Сессия создана!');
+                    Yii::$app->session->setFlash('success', 'Session was created!');
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
             }

@@ -87,7 +87,7 @@ class GameSessionSearch extends GameSession
             'created_at' => $this->created_at,
         ]);
 
-        $query->andFilterWhere(['ilike', 'status', $this->status]);
+        $query->andFilterWhere(['like', 'game_sessions.status', $this->status]);
         // Фильтрация по названию игры
         $query->andFilterWhere(['like', 'games.title', $this->gameTitle]);
         $query->andFilterWhere(['like', 'user.username', $this->organizerUsername]);

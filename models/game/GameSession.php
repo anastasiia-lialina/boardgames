@@ -178,7 +178,7 @@ class GameSession extends ActiveRecord
      */
     public function getStatusLabel()
     {
-        return ArrayHelper::getValue($this->getStatusLabels(), $this->status);
+        return ArrayHelper::getValue($this->getStatusLabels(), $this->status, Yii::t('app', 'Planned'));
     }
 
     public function getStatusLabels(): array

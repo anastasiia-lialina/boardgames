@@ -37,7 +37,6 @@ class GameController extends Controller
                     [
                         'allow' => true,
                         'actions' => ['create', 'update', 'delete'],
-                        'roles' => ['@'],
                         'permissions' => ['manageGames'],
                     ],
                 ],
@@ -89,7 +88,7 @@ class GameController extends Controller
         if ($reviewForm->load(Yii::$app->request->post())) {
             $reviewForm->user_id = Yii::$app->user->id;
             if ($reviewForm->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Отзыв отправлен на модерацию!'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Review sent for moderation!'));
                 $this->refresh();
             }
         }

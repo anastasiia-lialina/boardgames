@@ -3,6 +3,7 @@
 namespace app\commands;
 
 use app\models\user\User;
+use app\rbac\OrganizerRule;
 use Yii;
 use yii\console\Controller;
 
@@ -17,68 +18,97 @@ class RbacController extends Controller
     public function actionInit()
     {
         $auth = Yii::$app->authManager;
-        $auth->removeAll(); // Remove old assignments
+        $auth->removeAll(); // Полная очистка перед обновлением
 
-        // Create permissions
-        $manageReviews = $auth->createPermission('manageReviews');
-        $manageReviews->description = 'Управлять отзывами (одобрять/отклонять)';
-        $auth->add($manageReviews);
+        // --- RULES---
+        $rule = new OrganizerRule();
+        $auth->add($rule);
 
+        // --- PERMISSIONS
+
+        // Отзывы
         $createReview = $auth->createPermission('createReview');
         $createReview->description = 'Создавать отзывы';
         $auth->add($createReview);
 
+        $manageReviews = $auth->createPermission('manageReviews');
+        $manageReviews->description = 'Модерировать отзывы (одобрение/отклонение)';
+        $auth->add($manageReviews);
+
+        // Игровые сессии
         $createSession = $auth->createPermission('createSession');
         $createSession->description = 'Создавать игровые сессии';
         $auth->add($createSession);
 
+        $updateSession = $auth->createPermission('updateSession');
+        $updateSession->description = 'Редактировать любую сессию';
+        $auth->add($updateSession);
+
+        $deleteSession = $auth->createPermission('deleteSession');
+        $deleteSession->description = 'Удалять любую сессию';
+        $auth->add($deleteSession);
+
+        // Игровые сессии с правилом
         $updateOwnSession = $auth->createPermission('updateOwnSession');
-        $updateOwnSession->description = 'Редактировать свои сессии';
+        $updateOwnSession->description = 'Редактировать свою сессию';
+        $updateOwnSession->ruleName = $rule->name;
         $auth->add($updateOwnSession);
 
         $deleteOwnSession = $auth->createPermission('deleteOwnSession');
-        $deleteOwnSession->description = 'Удалять свои сессии';
+        $deleteOwnSession->description = 'Удалять свою сессию';
+        $deleteOwnSession->ruleName = $rule->name;
         $auth->add($deleteOwnSession);
 
+        // полные разрешения
         $manageSessions = $auth->createPermission('manageSessions');
-        $manageSessions->description = 'Управлять всеми сессиями';
+        $manageSessions->description = 'Полное управление всеми сессиями';
         $auth->add($manageSessions);
 
         $manageGames = $auth->createPermission('manageGames');
-        $manageGames->description = 'Управлять играми';
+        $manageGames->description = 'Управлять справочником игр';
         $auth->add($manageGames);
 
-        // Create roles
-        $admin = $auth->createRole('admin');
-        $admin->description = 'Администратор';
-        $auth->add($admin);
+        // --- ИЕРАРХИЯ ПРАВ ---
+        $auth->addChild($updateOwnSession, $updateSession);
+        $auth->addChild($deleteOwnSession, $deleteSession);
 
-        $moderator = $auth->createRole('moderator');
-        $moderator->description = 'Модератор';
-        $auth->add($moderator);
 
+        $auth->addChild($updateSession, $manageSessions);
+        $auth->addChild($deleteSession, $manageSessions);
+        $auth->addChild($createSession, $manageSessions);
+
+        // --- РОЛИ ---
+
+        // USER
         $user = $auth->createRole('user');
         $user->description = 'Пользователь';
         $auth->add($user);
-
-        $guest = $auth->createRole('guest');
-        $guest->description = 'Гость';
-        $auth->add($guest);
-
-        // Привязка разрешений ролям
-        // Админ
-        $auth->addChild($admin, $manageReviews);
-        $auth->addChild($admin, $manageSessions);
-        $auth->addChild($admin, $manageGames);
-
-        // Модератор
-        $auth->addChild($moderator, $manageReviews);
-
-        // User
         $auth->addChild($user, $createReview);
         $auth->addChild($user, $createSession);
         $auth->addChild($user, $updateOwnSession);
         $auth->addChild($user, $deleteOwnSession);
+
+        // MODERATOR
+        $moderator = $auth->createRole('moderator');
+        $moderator->description = 'Модератор';
+        $auth->add($moderator);
+        $auth->addChild($moderator, $user);
+        $auth->addChild($moderator, $manageReviews);
+        $auth->addChild($moderator, $updateSession);
+        $auth->addChild($moderator, $deleteSession);
+
+        // ADMIN
+        $admin = $auth->createRole('admin');
+        $admin->description = 'Администратор';
+        $auth->add($admin);
+        $auth->addChild($admin, $moderator);
+        $auth->addChild($admin, $manageSessions);
+        $auth->addChild($admin, $manageGames);
+
+        // GUEST
+        $guest = $auth->createRole('guest');
+        $guest->description = 'Гость';
+        $auth->add($guest);
 
         $this->stdout("RBAC roles and permissions initialized successfully!\n");
     }

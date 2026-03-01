@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models\search\models;
+namespace app\models\search;
 
 use app\models\game\GameSubscription;
 use yii\base\Model;

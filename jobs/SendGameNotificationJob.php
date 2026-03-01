@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace app\jobs;
 
@@ -13,9 +14,9 @@ use Yii;
  */
 class SendGameNotificationJob extends BaseObject implements RetryableJobInterface
 {
-    public $statusLabel;
-    public $gameId;
-    public $sessionId;
+    public string $statusLabel;
+    public int $gameId;
+    public int $sessionId;
     public $sessionDate;
 
     public int $maxAttempts = 3;

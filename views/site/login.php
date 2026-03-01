@@ -1,62 +1,45 @@
 <?php
 
-/** @var yii\web\View $this */
-/** @var yii\bootstrap5\ActiveForm $form */
-
-/** @var \app\models\forms\LoginForm $model */
-
+use app\models\forms\LoginForm;
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
 
-$this->title = 'Login';
-$this->params['breadcrumbs'][] = $this->title;
+/** @var LoginForm $model */
+
+$this->title = Yii::t('app', 'Login');
 ?>
 <div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="row justify-content-center mt-5">
+        <div class="col-lg-4 col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4"><?= Html::encode($this->title) ?></h2>
 
-    <p><?= Yii::t('app', 'Please fill out the following fields to login:')?> </p>
+                    <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-    <div class="row">
-        <div class="col-lg-5">
+                    <?= $form->field($model, 'username')->textInput(['autofocus' => true, 'placeholder' => true]) ?>
 
-            <?php $form = ActiveForm::begin([
-                'id' => 'login-form',
-                'fieldConfig' => [
-                    'template' => "{label}\n{input}\n{error}",
-                    'labelOptions' => ['class' => 'col-lg-1 col-form-label mr-lg-3'],
-                    'inputOptions' => ['class' => 'col-lg-3 form-control'],
-                    'errorOptions' => ['class' => 'col-lg-7 invalid-feedback d-block'],
-                ],
-            ]); ?>
+                    <?= $form->field($model, 'password')->passwordInput(['placeholder' => true]) ?>
 
-            <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+                    <?= $form->field($model, 'rememberMe')->checkbox([
+                            'template' => "<div class=\"form-check mb-3\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
+                    ]) ?>
 
-            <?= $form->field($model, 'password')->passwordInput() ?>
+                    <div class="form-group d-grid">
+                        <?= Html::submitButton(Yii::t('app', 'Login'), ['class' => 'btn btn-success btn-lg', 'name' => 'login-button']) ?>
+                    </div>
 
-            <?= $form->field($model, 'rememberMe')->checkbox([
-                'template' => "<div class=\"custom-control custom-checkbox\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            ]) ?>
-
-            <div class="form-group">
-                <div>
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                    <?php ActiveForm::end(); ?>
                 </div>
             </div>
-
-            <?php ActiveForm::end(); ?>
-
-            <p>
-                <?= Yii::t('app', 'Или') ?> <?= Html::a(Yii::t('app', 'зарегистрироваться'), ['signup']) ?>
-            </p>
-
-            <?php  if (YII_ENV_DEV): ?>
-                <p class="text-muted">
-                    <?= Yii::t('app', 'Тестовые пользователи:') ?><br>
-                    <?= Yii::t('app', 'admin / test') ?><br>
-                    <?= Yii::t('app', 'moderator / test') ?><br>
-                    <?= Yii::t('app', 'user1 / test') ?>
-                </p>
-            <?php endif; ?>
         </div>
     </div>
+    <?php  if (YII_ENV_DEV): ?>
+        <p class="text-muted">
+            <?= Yii::t('app', 'Тестовые пользователи:') ?><br>
+            <?= Yii::t('app', 'admin / test') ?><br>
+            <?= Yii::t('app', 'moderator / test') ?><br>
+            <?= Yii::t('app', 'user1 / test') ?>
+        </p>
+    <?php endif; ?>
 </div>

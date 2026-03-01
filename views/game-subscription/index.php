@@ -1,6 +1,6 @@
 <?php
 
-use app\models\search\models\GameSubscriptionSearch;
+use app\models\search\GameSubscriptionSearch;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -14,10 +14,6 @@ $this->title = Yii::t('app', 'Subscriptions');
 <div class="game-subscription-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a(Yii::t('app', 'Subscribe to a game'), ['game/index'], ['class' => 'btn btn-success']) ?>
-    </p>
 
     <?php Pjax::begin(); ?>
 
@@ -63,11 +59,8 @@ $this->title = Yii::t('app', 'Subscriptions');
                         $title = $model->is_active
                             ? Yii::t('app', 'Deactivate')
                             : Yii::t('app', 'Activate');
-                        $icon = $model->is_active
-                            ? '<i class="bi bi-toggle-off"></i>'
-                            : '<i class="bi bi-toggle-on"></i>';
 
-                        return Html::a($icon, ['toggle', 'id' => $model->id], [
+                        return Html::a($title, ['toggle', 'id' => $model->id], [
                             'title' => $title,
                             'class' => 'btn btn-sm ' . ($model->is_active ? 'btn-secondary' : 'btn-primary'),
                             'data' => [
@@ -77,8 +70,7 @@ $this->title = Yii::t('app', 'Subscriptions');
                         ]);
                     },
                     'delete' => function ($url, $model) {
-                        return Html::a('<i class="bi bi-trash"></i>', ['delete', 'id' => $model->id], [
-                            'title' => Yii::t('app', 'Delete'),
+                        return Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
                             'class' => 'btn btn-sm btn-danger',
                             'data' => [
                                 'method' => 'post',

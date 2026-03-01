@@ -1,70 +1,79 @@
 <?php
 
 use app\models\game\GameSession;
+use app\models\search\GameSessionSearch;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 
-/* @var $this yii\web\View */
-/* @var $searchModel \app\models\search\GameSessionSearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
+/**
+ * @var yii\data\ActiveDataProvider$dataProvider
+ * @var GameSessionSearch$searchModel
+ */
 
 $this->title = Yii::t('app', 'Game Sessions');
-$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="game-session-index">
+<div class="game-session-index container mt-4">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+        <?php if (Yii::$app->user->can('createSession')): ?>
+            <?= Html::a(Yii::t('app', 'Create Session'), ['create'], ['class' => 'btn btn-success btn-sm']) ?>
+        <?php endif; ?>
+    </div>
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Create Session'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <div class="table-responsive bg-white shadow-sm rounded border">
+        <?php Pjax::begin(); ?>
 
-    <?php Pjax::begin(); ?>
-
-    <?= GridView::widget([
+        <?=
+        GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
+            'tableOptions' => ['class' => 'table table-hover mb-0'],
+            'layout' => "{items}\n<div class='p-3 border-top small'>{pager}</div>",
             'columns' => [
-                    ['class' => 'yii\grid\SerialColumn'],
+                'id',
+                [
+                    'attribute' => 'gameTitle',
+                    'value' => 'game.title',
+                ],
+                [
+                    'attribute' => 'organizerUsername',
+                    'value' => 'organizer.username',
+                ],
+                'scheduled_at:datetime',
+                'max_participants',
+                [
+                    'attribute' => 'status',
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        $colors = [
+                            GameSession::STATUS_PLANNED => 'text-bg-info',
+                            GameSession::STATUS_ACTIVE => 'text-bg-primary',
+                            GameSession::STATUS_COMPLETED => 'text-bg-success',
+                            GameSession::STATUS_CANCELLED => 'text-bg-danger',
+                        ];
+                        $color = $colors[$model->status] ?? 'text-bg-secondary';
 
-                    'id',
-                    [
-                        'attribute' => 'gameTitle',
-                        'value' => 'game.title',
-                    ],
-                    [
-                        'attribute' => 'organizerUsername',
-                        'value' => 'organizer.username',
-                    ],
-                    'scheduled_at:datetime',
-                    'max_participants',
-                    [
-                            'attribute' => 'status',
-                            'value' => function ($model) {
-                                $classMap = [
-                                        GameSession::STATUS_PLANNED => 'bg-info text-dark',
-                                        GameSession::STATUS_ACTIVE => 'bg-primary',
-                                        GameSession::STATUS_COMPLETED => 'bg-success',
-                                        GameSession::STATUS_CANCELLED => 'bg-danger',
-                                ];
-
-                                $class = $classMap[$model->status] ?? 'bg-secondary';
-
-                                return Html::tag('span', $model->statusLabel, ['class' => "badge $class"]);
+                        return "<span class=\"badge $color\">" . Html::encode($model->statusLabel) . "</span>";
+                    },
+                    'filter' => $searchModel->getStatusLabels(),
+                ],
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'visibleButtons' => [
+                            'update' => function ($model, $key, $index) {
+                                return Yii::$app->user->can('updateSession', ['model' => $model]);
                             },
-
-                            'format' => 'raw',
-                            'filter' => function ($model) {
-                                return $model->getStatusLabels();
-
+                            'delete' => function ($model, $key, $index) {
+                                return Yii::$app->user->can('deleteSession', ['model' => $model]);
                             },
                     ],
-                    [
-                            'class' => 'yii\grid\ActionColumn',
-                    ],
+                    'buttonOptions' => ['class' => 'btn btn-link btn-sm text-decoration-none'],
+                ],
             ],
-    ]); ?>
+        ]); ?>
 
-    <?php Pjax::end(); ?>
+        <?php Pjax::end(); ?>
+    </div>
 </div>

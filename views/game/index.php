@@ -18,9 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Create Game'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <?php if (Yii::$app->user->can('manageGames')): ?>
+        <p>
+            <?= Html::a(Yii::t('app', 'Create Game'), ['create'], ['class' => 'btn btn-success']) ?>
+        </p>
+    <?php endif; ?>
 
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]);?>
@@ -32,7 +34,14 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'title',
+            [
+                'attribute' => 'title',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return Html::a($model->title, ['game/view', 'id' => $model->id], ['target' => '_blank']);
+                }
+
+            ],
             'description:ntext',
             'players_min',
             'players_max',
@@ -45,6 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'urlCreator' => function ($action, Game $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                 },
+                'visible' => Yii::$app->user->can('manageGames'),
             ],
         ],
     ]); ?>

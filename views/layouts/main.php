@@ -6,7 +6,6 @@
 use app\assets\AppAsset;
 use app\components\NotificationsBS5;
 use app\widgets\Alert;
-use webzop\notifications\widgets\Notifications;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
@@ -32,68 +31,74 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <?php $this->beginBody() ?>
 
 <header id="header">
-    <?php
-    if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => Yii::t('app', 'Signup'), 'url' => ['/site/signup']];
-        $menuItems[] = ['label' => Yii::t('app', 'Login'), 'url' => ['/site/login']];
-    } else {
-        // Проверяем права доступа
-        $canCreateSession = Yii::$app->user->can('createSession');
-        $canCreateReview = Yii::$app->user->can('createReview');
-        $canManageReviews = Yii::$app->user->can('manageReviews');
-        $canManageGames = Yii::$app->user->can('manageGames');
+<?php
 
-        $menuItems[] = ['label' => Yii::t('app', 'Games'), 'url' => ['/game/index']];
+    $isGuest = Yii::$app->user->isGuest;
+    $isUser = Yii::$app->user->can('user');
+    $canCreateSession = Yii::$app->user->can('createSession');
+    $canManageReviews = Yii::$app->user->can('manageReviews');
 
-        if ($canCreateSession) {
-            $menuItems[] = ['label' => Yii::t('app', 'Create Session'), 'url' => ['/game-session/create']];
-        }
+    $menuItems = [
+        [
+            'label' => Yii::t('app', 'Games'),
+            'url' => ['/game/index'],
+        ],
+        [
+            'label' => Yii::t('app', 'Game Sessions'),
+            'url' => ['/game-session/index'],
+        ],
+        [
+                'label' => Yii::t('app', 'Review Moderation'),
+                'url' => ['/admin/index'],
+                'visible' => $canManageReviews,
+        ],
+        [
+                'label' => Yii::t('app', 'Subscriptions'),
+                'url' => ['/game-subscription/index'],
+                'visible' => $isUser,
+        ],
+        [
+            'label' => NotificationsBS5::widget(['id' => 'notifications']),
+            'url' => ['/notifications/default/index'],
+            'encode' => false,
+            'options' => [
+                'id' => 'notifications',
+                'class' => 'nav-item',
+            ],
+            'linkOptions' => [
+                'class' => 'nav-link d-flex align-items-center',
+            ],
+            'visible' => $isUser,
+        ],
+        [
+                'label' => Yii::t('app', 'Signup'),
+                'url' => ['/site/signup'],
+                'visible' => $isGuest,
+        ],
+        [
+                'label' => Yii::t('app', 'Login'),
+                'url' => ['/site/login'],
+                'visible' => $isGuest,
+        ],
+        [
+            'label' => Yii::t('app', 'Logout'),
+            'url' => ['/site/logout'], 'linkOptions' => ['data-method' => 'post'],
+            'visible' => !$isGuest,
+        ],
+    ];
 
-        if ($canManageReviews) {
-            $menuItems[] = ['label' => Yii::t('app', 'Review Moderation'), 'url' => ['/admin/index']];
-        }
+    NavBar::begin([
+        'brandLabel' => Yii::$app->name,
+        'brandUrl' => Yii::$app->homeUrl,
+        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top'],
+    ]);
+    echo Nav::widget([
+        'options' => ['class' => 'navbar-nav'],
+            'items' => $menuItems,
+    ]);
 
-        if ($canManageGames) {
-            $menuItems[] = ['label' => Yii::t('app', 'Games'), 'url' => ['/game/index']];
-        }
-
-        $menuItems[] = [
-                'label' => NotificationsBS5::widget(['id' => 'notifications']),
-                'url' => ['/notifications/default/index'],
-                'encode' => false,
-                'options' => [
-                        'id' => 'notifications',
-                        'class' => 'nav-item',
-                ],
-                'linkOptions' => [
-                        'class' => 'nav-link d-flex align-items-center',
-                ],
-        ];
-
-        $menuItems[] = ['label' => Yii::t('app', 'Выход'), 'url' => ['/site/logout'], 'linkOptions' => ['data-method' => 'post']];
-    }
-
-
-
-NavBar::begin([
-    'brandLabel' => Yii::$app->name,
-    'brandUrl' => Yii::$app->homeUrl,
-    'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top'],
-]);
-echo Nav::widget([
-    'options' => ['class' => 'navbar-nav'],
-        'items' => $menuItems,
-]);
-
-NavBar::end();
+    NavBar::end();
 ?>
-
-
-
-
-
-
-
 
 </header>
 

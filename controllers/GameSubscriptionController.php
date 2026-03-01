@@ -5,7 +5,7 @@ namespace app\controllers;
 use app\models\game\Game;
 use Yii;
 use app\models\game\GameSubscription;
-use app\models\search\models\GameSubscriptionSearch;
+use app\models\search\GameSubscriptionSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -22,7 +22,7 @@ class GameSubscriptionController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'permissions' => ['user'],
                     ],
                 ],
             ],
@@ -57,13 +57,8 @@ class GameSubscriptionController extends Controller
      */
     public function actionSubscribe(): Response
     {
-        //TODO убрать дублирование кода с actionUnsubscribe и добавить переводы
         $gameId = $this->request->post('gameId');
-        $game = Game::findOne($gameId);
-        if (!$game) {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Game not found.'));
-            return $this->redirect(['game/index']);
-        }
+        $game = $this->findGameModel($gameId);
 
         if (GameSubscription::subscribe(Yii::$app->user->id, $gameId)) {
             Yii::$app->session->setFlash('success', Yii::t('app', 'You have subscribed to the game "{game}".', ['game' => $game->title]));
@@ -80,11 +75,7 @@ class GameSubscriptionController extends Controller
     public function actionUnsubscribe(): Response
     {
         $gameId = $this->request->post('gameId');
-        $game = Game::findOne($gameId);
-        if (!$game) {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Game not found.'));
-            return $this->redirect(['game/index']);
-        }
+        $game = $this->findGameModel($gameId);
 
         if (GameSubscription::unsubscribe(Yii::$app->user->id, $gameId)) {
             Yii::$app->session->setFlash('success', Yii::t('app', 'You have unsubscribed from the "{game}".', ['game' => $game->title]));
@@ -150,6 +141,14 @@ class GameSubscriptionController extends Controller
             return $model;
         }
 
+        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    protected function findGameModel(int $id): Game
+    {
+        if ($game = Game::findOne($id)) {
+            return $game;
+        }
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 }

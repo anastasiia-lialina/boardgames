@@ -21,7 +21,7 @@ use yii\helpers\Html;
             <?php if ($model->user): ?>
                 <strong><?= Html::encode($model->user->username) ?></strong>
             <?php else: ?>
-                <strong><?= Yii::t('app', 'Неизвестный пользователь') ?></strong>
+                <strong><?= Yii::t('app', 'Unknown user') ?></strong>
             <?php endif; ?>
             | <?= Yii::$app->formatter->asDatetime($model->created_at) ?>
         </small>
