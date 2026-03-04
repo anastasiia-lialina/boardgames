@@ -41,13 +41,13 @@ YiiAsset::register($this);
                             'format' => 'raw',
                     ],
                     'organizer.username',
-                    'scheduled_at:datetime',
+                    'scheduled_at',
                     'max_participants',
                     [
                             'attribute' => 'status',
                             'value' => $model->statusLabel,
                     ],
-                    'created_at:datetime',
+                    'created_at',
             ],
     ]) ?>
 

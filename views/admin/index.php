@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->comment ? mb_substr($model->comment, 0, 100) . '...' : '-';
                             },
                     ],
-                    'created_at:datetime',
+                    'created_at',
 
                     [
                             'class' => 'yii\grid\ActionColumn',

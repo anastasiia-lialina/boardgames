@@ -105,11 +105,13 @@ class Game extends ActiveRecord
      */
     public function getAverageRating(): float|int
     {
-        $rating = Review::find()
-            ->where(['game_id' => $this->id, 'is_approved' => true])
-            ->average('rating');
+        $key = "game:{$this->id}:rating";
 
-        return $rating ? round($rating, 1) : 0;
+        return Yii::$app->cache->getOrSet($key, function() {
+            return $this->getReviews()
+                ->andWhere(['is_approved' => true])
+                ->average('rating') ?? 0;
+        }, 300);
     }
 
     /**

@@ -80,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => $model->complexity . '/5',
                     ],
                     'year',
-                    'created_at:datetime',
+                    'created_at',
                     [
                             'attribute' => 'averageRating',
                             'label' => Yii::t('app', 'Average Rating'),

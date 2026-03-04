@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'rating',
             'comment:ntext',
             'is_approved:boolean',
-            'created_at:datetime',
+            'created_at',
             [
                 'class' => ActionColumn::class,
                 'urlCreator' => function ($action, Review $model, $key, $index, $column) {

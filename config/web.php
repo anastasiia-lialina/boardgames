@@ -27,10 +27,6 @@ $config = [
     ],
     'timeZone' => 'Europe/Moscow',
     'components' => [
-        'formatter' => [
-            'dateFormat' => 'dd.MM.yyyy',
-            'datetimeFormat' => 'dd.MM.yyyy HH:mm',
-        ],
         'request' => [
             'cookieValidationKey' => getenv('APP_KEY') ?: 'your-secret-key-here',
             'baseUrl' => '',
@@ -53,6 +49,9 @@ $config = [
             'identityClass' => 'app\models\user\User',
             'enableAutoLogin' => true,
             'loginUrl' => ['site/login'],
+            'as rateLimiter' => [
+                'class' => 'yii\filters\RateLimiter',
+            ],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',

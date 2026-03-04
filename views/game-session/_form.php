@@ -28,15 +28,13 @@ use yii\helpers\Html;
             'options' => [
                     'placeholder' => Yii::t('app', 'Select date and time...'),
                     'autocomplete' => 'off',
-                    'value' => $model->scheduled_at
-                            ? Yii::$app->formatter->asDatetime($model->scheduled_at, 'php:d.m.Y H:i')
-                            : '',
+                    'value' => $model->scheduled_at ?? '',
             ],
             'pluginOptions' => [
                     'autoclose' => true,
                     'todayHighlight' => true,
-                    'format' => 'dd.mm.yyyy hh:ii',
-                    'startDate' => $model->isNewRecord ? date('dd.mm.yyyy hh:ii') : null, // Только будущие даты при создании
+                    'format' => 'yyyy-mm-dd hh:ii:ss',
+                    //'startDate' => $model->isNewRecord ? date('dd.mm.yyyy hh:ii') : null, // Только будущие даты при создании
                     'todayBtn' => true,
                     'minuteStep' => 5,
             ],

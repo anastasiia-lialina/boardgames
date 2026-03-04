@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'comment:ntext',
             'is_approved:boolean',
-            'created_at:datetime',
+            'created_at',
         ],
     ]) ?>
 

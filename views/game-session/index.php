@@ -41,7 +41,7 @@ $this->title = Yii::t('app', 'Game Sessions');
                     'attribute' => 'organizerUsername',
                     'value' => 'organizer.username',
                 ],
-                'scheduled_at:datetime',
+                'scheduled_at',
                 'max_participants',
                 [
                     'attribute' => 'status',
