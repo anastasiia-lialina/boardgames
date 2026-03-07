@@ -25,6 +25,9 @@ $config = [
         ],
     ],
     'components' => [
+        'gameSessionService' => [
+            'class' => 'app\services\GameSessionService',
+        ],
         'formatter' => [
             'dateFormat' => 'dd.MM.yyyy',
             'datetimeFormat' => 'dd.MM.yyyy HH:mm',

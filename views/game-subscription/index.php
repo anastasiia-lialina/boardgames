@@ -46,10 +46,7 @@ $this->title = Yii::t('app', 'Subscriptions');
                     0 => Yii::t('app', 'Inactive'),
                 ],
             ],
-            [
-                'attribute' => 'created_at',
-                'format' => 'datetime',
-            ],
+            'created_at',
 
             [
                 'class' => 'yii\grid\ActionColumn',

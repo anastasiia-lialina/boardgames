@@ -3,8 +3,11 @@
 namespace app\commands;
 
 use app\models\game\GameSession;
+use app\services\GameSessionService;
+use Throwable;
 use yii\console\Controller;
 use yii\console\ExitCode;
+use yii\helpers\BaseConsole;
 use yii\helpers\Console;
 
 /**
@@ -12,21 +15,30 @@ use yii\helpers\Console;
  */
 class SessionController extends Controller
 {
+    public function __construct(
+        $id,
+        $module,
+        private readonly GameSessionService $gameSessionService,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * Отмена просроченных запланированных сессий (которые должны были начаться до сегодняшнего для)
      */
     public function actionUpdateStatus(): int
     {
         try {
-            $count = GameSession::updateExpiredSessions();
+            $count = $this->gameSessionService->updateExpiredSessions();
 
             if ($count > 0) {
-                $this->stdout("Успешно отменено просроченных сессий: $count\n", Console::FG_GREEN);
+                $this->stdout("Успешно отменено просроченных сессий: $count\n", BaseConsole::FG_GREEN);
             } else {
-                $this->stdout("Нет просроченных сессий для отмены\n", Console::FG_YELLOW);
+                $this->stdout("Нет просроченных сессий для отмены\n", BaseConsole::FG_YELLOW);
             }
-        } catch (\Exception $e) {
-            $this->stderr("Ошибка при выполнении: " . $e->getMessage() . "\n", Console::FG_RED);
+        } catch (Throwable $e) {
+            $this->stderr("Ошибка при выполнении: " . $e->getMessage() . "\n", BaseConsole::FG_RED);
             return ExitCode::UNSPECIFIED_ERROR;
         }
         return ExitCode::OK;
@@ -37,13 +49,13 @@ class SessionController extends Controller
      */
     public function actionCheckStale(): void
     {
-        $count = GameSession::findStalePlannedCount();
+        $count = $this->gameSessionService->findStalePlannedCount();
 
         if ($count > 0) {
-            $this->stdout("Найдено просроченных сессий: $count\n", Console::FG_CYAN);
-            $this->stdout("Запустите: php yii session/update-status\n", Console::FG_YELLOW);
+            $this->stdout("Найдено просроченных сессий: $count\n", BaseConsole::FG_CYAN);
+            $this->stdout("Запустите: php yii session/update-status\n", BaseConsole::FG_YELLOW);
         } else {
-            $this->stdout("Просроченных сессий нет.\n", Console::FG_GREEN);
+            $this->stdout("Просроченных сессий нет.\n", BaseConsole::FG_GREEN);
         }
     }
 }

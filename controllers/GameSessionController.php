@@ -2,19 +2,34 @@
 
 namespace app\controllers;
 
+use app\models\forms\GameSessionForm;
 use app\models\game\GameSession;
 use app\models\search\GameSessionSearch;
+use app\services\GameSessionService;
+use Throwable;
 use Yii;
+use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
+use function PHPUnit\Framework\throwException;
 
 /**
  * GameSessionController implements the CRUD actions for GameSession model.
  */
 class GameSessionController extends Controller
 {
+    public function __construct(
+        $id,
+        $module,
+        private readonly GameSessionService $gameSessionService,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * @inheritDoc
      */
@@ -40,7 +55,7 @@ class GameSessionController extends Controller
                         'actions' => ['update', 'delete'],
                         'roles' => ['updateSession'],
                         'roleParams' => function($rule) {
-                            return ['model' => $this->findModel(Yii::$app->request->get('id'))];
+                            return ['model' => $this->gameSessionService->findModel(Yii::$app->request->get('id'))];
                         },
                     ],
                 ],
@@ -57,12 +72,13 @@ class GameSessionController extends Controller
     /**
      * Lists all GameSession models.
      * @return mixed
+     * @throws Throwable
      */
     public function actionIndex()
     {
         // Для тестирования обновляем статусы при открытии списка, на проде это должно происходить через крон
         if (YII_ENV === 'dev') {
-            GameSession::updateExpiredSessions();
+            $this->gameSessionService->updateExpiredSessions();
         }
 
         $searchModel = new GameSessionSearch();
@@ -81,37 +97,31 @@ class GameSessionController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView($id): mixed
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->gameSessionService->findModel($id),
         ]);
     }
 
     /**
      * Creates a new GameSession model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @return string|Response
+     * @throws Exception
      */
-    public function actionCreate()
+    public function actionCreate(): string|Response
     {
-        $model = new GameSession();
+        $form = new GameSessionForm();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post())) {
-                $model->organizer_id = Yii::$app->user->id;
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $session = $this->gameSessionService->createSession($form, Yii::$app->user->id);
 
-                if ($model->save()) {
-                    Yii::$app->session->setFlash('success', 'Session was created!');
-                    return $this->redirect(['view', 'id' => $model->id]);
-                }
-            }
-        } else {
-            $model->loadDefaultValues();
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Session was created!'));
+            return $this->redirect(['view', 'id' => $session->id]);
         }
-
         return $this->render('create', [
-            'model' => $model,
+            'model' => $form,
         ]);
     }
 
@@ -119,19 +129,31 @@ class GameSessionController extends Controller
      * Updates an existing GameSession model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @return string|Response
+     * @throws NotFoundHttpException|Exception if the model cannot be found
+     * @throws \yii\base\Exception
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id): string|Response
     {
-        $model = $this->findModel($id);
+        $session = $this->gameSessionService->findModel($id);
+        $form = new GameSessionForm();
+        $form->isNewRecord = false;
+        $form->setAttributes($session->attributes);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $session = $this->gameSessionService->updateSession(
+                $id,
+                $form
+            );
+
+            if (!$session->hasErrors()) {
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Session was updated!'));
+                return $this->redirect(['view', 'id' => $session->id]);
+            }
         }
 
         return $this->render('update', [
-            'model' => $model,
+            'model' => $form,
         ]);
     }
 
@@ -144,24 +166,8 @@ class GameSessionController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $this->gameSessionService->deleteSession($id);
 
         return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the GameSession model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return GameSession the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = GameSession::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

@@ -2,22 +2,27 @@
 
 use app\components\RatingHelper;
 use app\models\game\GameSubscription;
+use app\models\search\GameSessionSearch;
+use app\models\search\ReviewSearch;
+use app\models\user\Review;
+use app\services\GameSubscriptionService;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
+use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\game\Game */
-/* @var $reviewsDataProvider \app\models\search\ReviewSearch */
-/* @var $sessionsDataProvider \app\models\search\GameSessionSearch */
-/* @var $reviewForm \app\models\user\Review */
+/* @var $reviewsDataProvider ReviewSearch */
+/* @var $sessionsDataProvider GameSessionSearch */
+/* @var $reviewForm Review */
 
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Games'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
+YiiAsset::register($this);
 ?>
 <div class="game-view">
 
@@ -35,26 +40,26 @@ $this->params['breadcrumbs'][] = $this->title;
             ]) ?>
         <?php endif; ?>
     </p>
-    <? if (!Yii::$app->user->isGuest): ?>
-            <?php $isSubscribed = GameSubscription::isSubscribed(Yii::$app->user->id, $model->id) ?>
+    <?php if (!Yii::$app->user->isGuest): ?>
+            <?php $isSubscribed = (new app\services\GameSubscriptionService)->isSubscribed(Yii::$app->user->id, $model->id) ?>
 
             <?= Html::beginForm(['/game-subscription/' . ($isSubscribed ? 'unsubscribe' : 'subscribe')], 'post', ['class' => 'd-inline-block mb-3']);?>
             <?= Html::hiddenInput('gameId', $model->id) ?>
 
-            <? if ($isSubscribed): ?>
+        <?php if ($isSubscribed): ?>
                 <?= Html::submitButton(
                         '<i class="bi bi-bell-slash"></i> ' . Yii::t('app', 'Unsubscribe'),
                         ['class' => 'btn btn-outline-secondary']
                 );?>
-            <? else: ?>
+        <?php else: ?>
                 <?= Html::submitButton(
                         '<i class="bi bi-bell"></i> ' . Yii::t('app', 'Subscribe'),
                         ['class' => 'btn btn-primary']
                 );?>
-            <? endif; ?>
+        <?php endif; ?>
 
             <?= Html::endForm();?>
-    <? endif; ?>
+    <?php endif; ?>
 
     <?= DetailView::widget([
             'model' => $model,

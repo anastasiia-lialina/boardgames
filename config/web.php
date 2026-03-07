@@ -27,6 +27,9 @@ $config = [
     ],
     'timeZone' => 'Europe/Moscow',
     'components' => [
+        'gameSessionService' => [
+            'class' => 'app\services\GameSessionService',
+        ],
         'request' => [
             'cookieValidationKey' => getenv('APP_KEY') ?: 'your-secret-key-here',
             'baseUrl' => '',
