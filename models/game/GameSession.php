@@ -3,15 +3,10 @@
 namespace app\models\game;
 
 use app\behaviors\StatusLogBehavior;
-use app\jobs\SendGameNotificationJob;
 use app\models\user\User;
-use app\services\GameSessionService;
-use DateTime;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\Expression;
-use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -88,7 +83,7 @@ class GameSession extends ActiveRecord
      *
      * @return string[] Array of allowed statuses.
      */
-    public static  function allowedStatuses(): array
+    public static function allowedStatuses(): array
     {
         return [
             self::STATUS_PLANNED,

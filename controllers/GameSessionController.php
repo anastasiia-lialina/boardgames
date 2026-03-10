@@ -14,7 +14,6 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
-use function PHPUnit\Framework\throwException;
 
 /**
  * GameSessionController implements the CRUD actions for GameSession model.
@@ -54,7 +53,7 @@ class GameSessionController extends Controller
                         'allow' => true,
                         'actions' => ['update', 'delete'],
                         'roles' => ['updateSession'],
-                        'roleParams' => function($rule) {
+                        'roleParams' => function ($rule) {
                             return ['model' => $this->gameSessionService->findModel(Yii::$app->request->get('id'))];
                         },
                     ],
@@ -117,7 +116,7 @@ class GameSessionController extends Controller
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
             $session = $this->gameSessionService->createSession($form, Yii::$app->user->id);
 
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Session was created!'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Game session created successfully!'));
             return $this->redirect(['view', 'id' => $session->id]);
         }
         return $this->render('create', [
@@ -147,7 +146,7 @@ class GameSessionController extends Controller
             );
 
             if (!$session->hasErrors()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Session was updated!'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Game session updated successfully!'));
                 return $this->redirect(['view', 'id' => $session->id]);
             }
         }

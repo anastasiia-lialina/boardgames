@@ -2,16 +2,15 @@
 
 namespace app\controllers;
 
-use app\models\game\Game;
 use app\models\game\GameSubscription;
+use app\models\search\GameSubscriptionSearch;
 use app\services\GameSubscriptionService;
 use Yii;
-use app\models\search\GameSubscriptionSearch;
 use yii\base\Exception;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 use yii\web\Response;
 
 class GameSubscriptionController extends Controller
@@ -51,7 +50,7 @@ class GameSubscriptionController extends Controller
                             return GameSubscription::find()
                                 ->where(['id' => $id, 'user_id' => Yii::$app->user->id])
                                 ->exists();
-                        }
+                        },
                     ],
                 ],
             ],
@@ -72,8 +71,11 @@ class GameSubscriptionController extends Controller
      */
     public function actionIndex(): string
     {
-        $searchModel = new GameSubscriptionSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, Yii::$app->user->id);
+        $searchModel = new \app\models\search\GameSubscriptionSearch();
+        $dataProvider = $this->subscriptionService->getSubscriptionProvider(
+            Yii::$app->request->queryParams,
+            Yii::$app->user->id
+        );
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -90,10 +92,11 @@ class GameSubscriptionController extends Controller
     {
         $gameId = $this->request->post('gameId');
 
-        if ($this->subscriptionService->subscribe(Yii::$app->user->id, $gameId)) {
+        try {
+            $this->subscriptionService->subscribe(Yii::$app->user->id, $gameId);
             Yii::$app->session->setFlash('success', Yii::t('app', 'You have subscribed to the game.'));
-        } else {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Error subscribing to the game.'));
+        } catch (\Exception $e) {
+            Yii::$app->session->setFlash('error', $e->getMessage());
         }
 
         return $this->redirect(['game/view', 'id' => $gameId]);
@@ -109,10 +112,11 @@ class GameSubscriptionController extends Controller
     {
         $gameId = $this->request->post('gameId');
 
-        if ($this->subscriptionService->unsubscribe(Yii::$app->user->id, $gameId)) {
+        try {
+            $this->subscriptionService->unsubscribe(Yii::$app->user->id, $gameId);
             Yii::$app->session->setFlash('success', Yii::t('app', 'You have unsubscribed from the game.'));
-        } else {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Error unsubscribing from the game.'));
+        } catch (\Exception $e) {
+            Yii::$app->session->setFlash('error', $e->getMessage());
         }
 
         return $this->redirect(['game/view', 'id' => $gameId]);
@@ -140,10 +144,11 @@ class GameSubscriptionController extends Controller
      */
     public function actionDelete($id): Response
     {
-        if ($this->subscriptionService->delete($id)) {
+        try {
+            $this->subscriptionService->deleteSubscription($id);
             Yii::$app->session->setFlash('success', Yii::t('app', 'Subscription to game has been removed.'));
-        } else {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Error deleting subscription.'));
+        } catch (\Exception $e) {
+            Yii::$app->session->setFlash('error', $e->getMessage());
         }
 
         return $this->redirect(['index']);

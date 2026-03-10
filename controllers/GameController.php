@@ -2,11 +2,12 @@
 
 namespace app\controllers;
 
+use app\models\forms\ReviewForm;
 use app\models\game\Game;
-use app\models\search\GameSearch;
 use app\models\search\GameSessionSearch;
 use app\models\search\ReviewSearch;
-use app\models\user\Review;
+use app\services\GameService;
+use app\services\ReviewService;
 use Yii;
 use yii\db\Exception;
 use yii\filters\AccessControl;
@@ -20,6 +21,15 @@ use yii\web\Response;
  */
 class GameController extends Controller
 {
+    public function __construct(
+        $id,
+        $module,
+        private readonly GameService $gameService,
+        private readonly ReviewService $reviewService,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+    }
     /**
      * @inheritDoc
      */
@@ -57,7 +67,7 @@ class GameController extends Controller
      */
     public function actionIndex(): string
     {
-        $searchModel = new GameSearch();
+        $searchModel = $this->gameService->getGameSearchModel();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -71,10 +81,11 @@ class GameController extends Controller
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException|Exception if the model cannot be found
+     * @throws \yii\base\Exception
      */
     public function actionView(int $id): string
     {
-        $model = $this->findModel($id);
+        $model = $this->gameService->getGameWithSessions($id);
 
         $reviewSearch = new ReviewSearch();
         $reviewsDataProvider = $reviewSearch->getApprovedReviewsForGame($id);
@@ -82,14 +93,20 @@ class GameController extends Controller
         $sessionSearch = new GameSessionSearch();
         $sessionsDataProvider = $sessionSearch->getUpcomingSessionsForGame($id);
 
-        $reviewForm = new Review();
+        $reviewForm = new ReviewForm();
         $reviewForm->game_id = $id;
+        $reviewForm->user_id = Yii::$app->user->id;
 
-        if ($reviewForm->load(Yii::$app->request->post())) {
-            $reviewForm->user_id = Yii::$app->user->id;
-            if ($reviewForm->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Review sent for moderation!'));
-                $this->refresh();
+        if ($reviewForm->load(Yii::$app->request->post()) && $reviewForm->validate()) {
+            try {
+                $review = $this->reviewService->createReview($reviewForm);
+                if ($review) {
+                    Yii::$app->session->setFlash('success', Yii::t('app', 'Review sent for moderation!'));
+                    $this->refresh();
+                }
+            } catch (\Throwable $e) {
+                var_dump($e->getMessage());
+                Yii::$app->session->setFlash('error', Yii::t('app', 'Review do not exist'));
             }
         }
 
@@ -109,13 +126,17 @@ class GameController extends Controller
      */
     public function actionCreate(): Response|string
     {
-        $model = new Game();
-
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            try {
+                $model = $this->gameService->createGame($this->request->post());
                 return $this->redirect(['view', 'id' => $model->id]);
+            } catch (Exception $e) {
+                Yii::$app->session->setFlash('error', $e->getMessage());
+                $model = new Game();
+                $model->load($this->request->post());
             }
         } else {
+            $model = new Game();
             $model->loadDefaultValues();
         }
 
@@ -133,10 +154,17 @@ class GameController extends Controller
      */
     public function actionUpdate($id): Response|string
     {
-        $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($this->request->isPost) {
+            try {
+                $model = $this->gameService->updateGame($id, $this->request->post());
+                return $this->redirect(['view', 'id' => $model->id]);
+            } catch (Exception $e) {
+                Yii::$app->session->setFlash('error', $e->getMessage());
+                $model = $this->gameService->findGame($id);
+                $model->load($this->request->post());
+            }
+        } else {
+            $model = $this->gameService->findGame($id);
         }
 
         return $this->render('update', [
@@ -153,24 +181,7 @@ class GameController extends Controller
      */
     public function actionDelete($id): Response
     {
-        $this->findModel($id)->delete();
-
+        $this->gameService->deleteGame($id);
         return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the Game model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Game the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id): Game
-    {
-        if (($model = Game::findOne(['id' => $id])) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 }

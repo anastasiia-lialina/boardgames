@@ -101,30 +101,6 @@ class Game extends ActiveRecord
     }
 
     /**
-     * Получить средний рейтинг игры
-     */
-    public function getAverageRating(): float|int
-    {
-        $key = "game:{$this->id}:rating";
-
-        return Yii::$app->cache->getOrSet($key, function() {
-            return $this->getReviews()
-                ->andWhere(['is_approved' => true])
-                ->average('rating') ?? 0;
-        }, 300);
-    }
-
-    /**
-     * Получить количество одобренных отзывов
-     */
-    public function getReviewsCount(): int
-    {
-        return Review::find()
-            ->where(['game_id' => $this->id, 'is_approved' => true])
-            ->count();
-    }
-
-    /**
      * Получить все отзывы
      */
     public function getReviews(): ActiveQuery

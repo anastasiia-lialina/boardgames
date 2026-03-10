@@ -4,15 +4,23 @@ namespace app\controllers;
 
 use app\models\forms\LoginForm;
 use app\models\forms\SignupForm;
+use app\services\UserService;
 use Yii;
 use yii\filters\AccessControl;
-use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\Response;
 
 class SiteController extends Controller
 {
+    public function __construct(
+        $id,
+        $module,
+        private readonly UserService $userService,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+    }
     /**
      * {@inheritdoc}
      */
@@ -40,11 +48,6 @@ class SiteController extends Controller
                 'actions' => [
                     'logout' => ['post'],
                 ],
-            ],
-            'rateLimiter' => [
-                'class' => RateLimiter::class,
-                'limit' => 5,
-                'window' => 60,
             ],
         ];
     }
@@ -117,9 +120,15 @@ class SiteController extends Controller
     public function actionSignup()
     {
         $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Thank you for registering! You can now log in.'));
-            return $this->redirect(['login']);
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            try {
+                $this->userService->createUser($model->getAttributes());
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Thank you for registering! You can now log in.'));
+                return $this->redirect(['login']);
+            } catch (\Exception $e) {
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
         }
 
         return $this->render('signup', [

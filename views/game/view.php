@@ -1,11 +1,9 @@
 <?php
 
 use app\components\RatingHelper;
-use app\models\game\GameSubscription;
 use app\models\search\GameSessionSearch;
 use app\models\search\ReviewSearch;
 use app\models\user\Review;
-use app\services\GameSubscriptionService;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
@@ -23,6 +21,9 @@ $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Games'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
+
+$reviewService = new app\services\ReviewService();
+$reviewCount = $reviewService->getReviewsCount($model->id);
 ?>
 <div class="game-view">
 
@@ -41,20 +42,20 @@ YiiAsset::register($this);
         <?php endif; ?>
     </p>
     <?php if (!Yii::$app->user->isGuest): ?>
-            <?php $isSubscribed = (new app\services\GameSubscriptionService)->isSubscribed(Yii::$app->user->id, $model->id) ?>
+            <?php $isSubscribed = (new app\services\GameSubscriptionService())->isSubscribed(Yii::$app->user->id, $model->id) ?>
 
             <?= Html::beginForm(['/game-subscription/' . ($isSubscribed ? 'unsubscribe' : 'subscribe')], 'post', ['class' => 'd-inline-block mb-3']);?>
             <?= Html::hiddenInput('gameId', $model->id) ?>
 
         <?php if ($isSubscribed): ?>
                 <?= Html::submitButton(
-                        '<i class="bi bi-bell-slash"></i> ' . Yii::t('app', 'Unsubscribe'),
-                        ['class' => 'btn btn-outline-secondary']
+                    '<i class="bi bi-bell-slash"></i> ' . Yii::t('app', 'Unsubscribe'),
+                    ['class' => 'btn btn-outline-secondary']
                 );?>
         <?php else: ?>
                 <?= Html::submitButton(
-                        '<i class="bi bi-bell"></i> ' . Yii::t('app', 'Subscribe'),
-                        ['class' => 'btn btn-primary']
+                    '<i class="bi bi-bell"></i> ' . Yii::t('app', 'Subscribe'),
+                    ['class' => 'btn btn-primary']
                 );?>
         <?php endif; ?>
 
@@ -90,8 +91,8 @@ YiiAsset::register($this);
                             'attribute' => 'averageRating',
                             'label' => Yii::t('app', 'Average Rating'),
                             'format' => 'raw',
-                            'value' => $model->averageRating . '/5' .
-                                    ' (' . Yii::t('app', '{n, plural, =0{No reviews} one{# review} few{# reviews} many{# reviews} other{# reviews}}', ['n' => $model->reviewsCount]) . ')',
+                            'value' => $reviewService->getAverageRating($model->id) . '/5' .
+                                    ' (' . Yii::t('app', '{n, plural, =0{No reviews} one{# review} few{# reviews} many{# reviews} other{# reviews}}', ['n' => $reviewCount]) . ')',
                     ],
             ],
     ]) ?>
@@ -115,7 +116,7 @@ YiiAsset::register($this);
     <?php endif; ?>
 
     <!-- Отзывы -->
-    <h2>Отзывы (<?= $model->reviewsCount ?>)</h2>
+    <h2>Отзывы (<?= $reviewCount ?>)</h2>
     <?php if ($reviewsDataProvider->totalCount > 0): ?>
         <?php Pjax::begin(['id' => 'reviews-pjax']); ?>
 
@@ -130,9 +131,6 @@ YiiAsset::register($this);
     <?php else: ?>
         <p class="text-muted">Нет отзывов.</p>
     <?php endif; ?>
-
-
-
 
     <?php if (!Yii::$app->user->isGuest && Yii::$app->user->can('createReview')): ?>
         <div class="review-form mt-4 bg-light p-3 rounded">

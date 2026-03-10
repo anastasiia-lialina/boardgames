@@ -2,9 +2,8 @@
 
 namespace app\notifications;
 
-use app\models\user\Review;
-use Yii;
 use webzop\notifications\Notification;
+use Yii;
 
 /**
  * Уведомление о том, что отзыв был опубликован

@@ -4,10 +4,9 @@ namespace app\models\game;
 
 use app\models\user\User;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\behaviors\TimestampBehavior;
-use yii\db\Exception;
 use yii\db\Expression;
 
 /**
@@ -24,8 +23,8 @@ use yii\db\Expression;
  */
 class GameSubscription extends ActiveRecord
 {
-    const STATUS_ACTIVE = 1;
-    const STATUS_INACTIVE = 0;
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_INACTIVE = 0;
 
     public static function tableName()
     {

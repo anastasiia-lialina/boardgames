@@ -1,6 +1,5 @@
 <?php
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\LinkPager;
 
 $this->title = Yii::t('modules/notifications', 'Notifications');
@@ -12,11 +11,11 @@ $this->title = Yii::t('modules/notifications', 'Notifications');
                 <h1 class="h3 mb-0 text-gray-800"><?= Html::encode($this->title) ?></h1>
                 <?= Html::a(Yii::t('modules/notifications', 'Mark all as read'), ['read-all'], [
                     'class' => 'btn btn-outline-primary btn-sm rounded-pill',
-                    'data-method' => 'post'
+                    'data-method' => 'post',
                 ]) ?>
                 <?= Html::a(Yii::t('modules/notifications', 'Delete all'), ['delete-all'], [
                     'class' => 'btn btn-outline-primary btn-sm rounded-pill',
-                    'data-method' => 'post'
+                    'data-method' => 'post',
                 ]) ?>
             </div>
 

@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'value' => function ($model) {
                     return Html::a($model->title, ['game/view', 'id' => $model->id], ['target' => '_blank']);
-                }
+                },
 
             ],
             'description:ntext',

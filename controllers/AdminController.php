@@ -2,9 +2,8 @@
 
 namespace app\controllers;
 
-use app\jobs\SendReviewNotificationJob;
 use app\models\search\ReviewSearch;
-use app\models\user\Review;
+use app\services\ReviewService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -15,6 +14,14 @@ use yii\web\Response;
  */
 class AdminController extends Controller
 {
+    public function __construct(
+        $id,
+        $module,
+        private readonly ReviewService $reviewService,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+    }
     /**
      * @inheritDoc
      */
@@ -55,26 +62,11 @@ class AdminController extends Controller
      */
     public function actionApprove($id): Response
     {
-        $model = Review::findOne($id);
-
-        if ($model) {
-            $model->is_approved = true;
-
-            if ($model->save()) {
-                // Отправляем уведомление
-                Yii::$app->queue->push(new SendReviewNotificationJob([
-                    'userId'     => $model->user_id,
-                    'gameId'     => $model->game_id,
-                    'gameName'   => $model->game->title,
-                    'isApproved' => true,
-                ]));
-
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Review approved!'));
-            } else {
-                Yii::$app->session->setFlash('error', Yii::t('app', 'Error approving review.'));
-            }
-        } else {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Review not found.'));
+        try {
+            $this->reviewService->approveReview($id);
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Review approved!'));
+        } catch (\Exception $e) {
+            Yii::$app->session->setFlash('error', $e->getMessage());
         }
 
         return $this->redirect(['index']);
@@ -85,25 +77,11 @@ class AdminController extends Controller
      */
     public function actionReject($id): Response
     {
-        $model = Review::findOne($id);
-
-        if ($model) {
-            // Сохраняем данные для джобы перед удалением
-            $jobData = [
-                'userId'     => $model->user_id,
-                'gameId'     => $model->game_id,
-                'gameName'   => $model->game->title,
-                'isApproved' => false,
-            ];
-
-            if ($model->delete()) {
-                Yii::$app->queue->push(new SendReviewNotificationJob($jobData));
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Review rejected!'));
-            } else {
-                Yii::$app->session->setFlash('error', Yii::t('app', 'Error rejecting review.'));
-            }
-        } else {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Review not found.'));
+        try {
+            $this->reviewService->rejectReview($id);
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Review rejected!'));
+        } catch (\Exception $e) {
+            Yii::$app->session->setFlash('error', $e->getMessage());
         }
 
         return $this->redirect(['index']);

@@ -2,8 +2,8 @@
 
 namespace app\notifications;
 
-use Yii;
 use webzop\notifications\Notification;
+use Yii;
 
 class SessionNotification extends Notification
 {
@@ -19,7 +19,7 @@ class SessionNotification extends Notification
         return Yii::t('app', 'Game "{game}": session on {date} has been {status}', [
             'game' => $this->gameName,
             'date' => $this->sessionDate,
-            'status' => $this->statusLabel
+            'status' => $this->statusLabel,
         ]);
     }
 

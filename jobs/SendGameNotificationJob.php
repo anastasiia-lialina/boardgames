@@ -1,13 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\jobs;
 
 use app\models\game\GameSubscription;
 use app\notifications\SessionNotification;
+use Yii;
 use yii\base\BaseObject;
 use yii\queue\RetryableJobInterface;
-use Yii;
 
 /**
  * Задание для отправки уведомлений подписчикам игры.
@@ -38,11 +39,11 @@ class SendGameNotificationJob extends BaseObject implements RetryableJobInterfac
         Yii::info("Найдено подписок: " . count($subscriptions), 'queue');
 
         foreach ($subscriptions as $sub) {
-            SessionNotification::create($this->sessionId,[
-                'userId'      => $sub->user_id,
-                'gameName'    => $sub->game->title,
+            SessionNotification::create($this->sessionId, [
+                'userId' => $sub->user_id,
+                'gameName' => $sub->game->title,
                 'sessionDate' => $this->sessionDate,
-                'statusLabel'  => $this->statusLabel
+                'statusLabel' => $this->statusLabel,
                 ])->send();
         }
         Yii::info("Рассылка завершена. Отправлено уведомлений: " . count($subscriptions), 'queue');

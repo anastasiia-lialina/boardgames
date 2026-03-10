@@ -34,70 +34,70 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <?php
 
     $isGuest = Yii::$app->user->isGuest;
-    $isUser = Yii::$app->user->can('user');
-    $canCreateSession = Yii::$app->user->can('createSession');
-    $canManageReviews = Yii::$app->user->can('manageReviews');
+$isUser = Yii::$app->user->can('user');
+$canCreateSession = Yii::$app->user->can('createSession');
+$canManageReviews = Yii::$app->user->can('manageReviews');
 
-    $menuItems = [
-        [
-            'label' => Yii::t('app', 'Games'),
-            'url' => ['/game/index'],
-        ],
-        [
-            'label' => Yii::t('app', 'Game Sessions'),
-            'url' => ['/game-session/index'],
-        ],
-        [
-                'label' => Yii::t('app', 'Review Moderation'),
-                'url' => ['/admin/index'],
-                'visible' => $canManageReviews,
-        ],
-        [
-                'label' => Yii::t('app', 'Subscriptions'),
-                'url' => ['/game-subscription/index'],
-                'visible' => $isUser,
-        ],
-        [
-            'label' => NotificationsBS5::widget(['id' => 'notifications']),
-            'url' => ['/notifications/default/index'],
-            'encode' => false,
-            'options' => [
-                'id' => 'notifications',
-                'class' => 'nav-item',
-            ],
-            'linkOptions' => [
-                'class' => 'nav-link d-flex align-items-center',
-            ],
+$menuItems = [
+    [
+        'label' => Yii::t('app', 'Games'),
+        'url' => ['/game/index'],
+    ],
+    [
+        'label' => Yii::t('app', 'Game Sessions'),
+        'url' => ['/game-session/index'],
+    ],
+    [
+            'label' => Yii::t('app', 'Review Moderation'),
+            'url' => ['/admin/index'],
+            'visible' => $canManageReviews,
+    ],
+    [
+            'label' => Yii::t('app', 'Subscriptions'),
+            'url' => ['/game-subscription/index'],
             'visible' => $isUser,
+    ],
+    [
+        'label' => NotificationsBS5::widget(['id' => 'notifications']),
+        'url' => ['/notifications/default/index'],
+        'encode' => false,
+        'options' => [
+            'id' => 'notifications',
+            'class' => 'nav-item',
         ],
-        [
-                'label' => Yii::t('app', 'Signup'),
-                'url' => ['/site/signup'],
-                'visible' => $isGuest,
+        'linkOptions' => [
+            'class' => 'nav-link d-flex align-items-center',
         ],
-        [
-                'label' => Yii::t('app', 'Login'),
-                'url' => ['/site/login'],
-                'visible' => $isGuest,
-        ],
-        [
-            'label' => Yii::t('app', 'Logout'),
-            'url' => ['/site/logout'], 'linkOptions' => ['data-method' => 'post'],
-            'visible' => !$isGuest,
-        ],
-    ];
+        'visible' => $isUser,
+    ],
+    [
+            'label' => Yii::t('app', 'Signup'),
+            'url' => ['/site/signup'],
+            'visible' => $isGuest,
+    ],
+    [
+            'label' => Yii::t('app', 'Login'),
+            'url' => ['/site/login'],
+            'visible' => $isGuest,
+    ],
+    [
+        'label' => Yii::t('app', 'Logout'),
+        'url' => ['/site/logout'], 'linkOptions' => ['data-method' => 'post'],
+        'visible' => !$isGuest,
+    ],
+];
 
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top'],
-    ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-            'items' => $menuItems,
-    ]);
+NavBar::begin([
+    'brandLabel' => Yii::$app->name,
+    'brandUrl' => Yii::$app->homeUrl,
+    'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top'],
+]);
+echo Nav::widget([
+    'options' => ['class' => 'navbar-nav'],
+        'items' => $menuItems,
+]);
 
-    NavBar::end();
+NavBar::end();
 ?>
 
 </header>

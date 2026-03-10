@@ -1,8 +1,8 @@
 <?php
 
 use app\models\search\GameSubscriptionSearch;
-use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
@@ -28,7 +28,7 @@ $this->title = Yii::t('app', 'Subscriptions');
                 'value' => function ($model) {
                     return Html::a($model->game->title, ['game/view', 'id' => $model->game_id], [
                         'target' => '_blank',
-                        'class' => 'text-decoration-none'
+                        'class' => 'text-decoration-none',
                     ]);
                 },
                 'format' => 'raw',

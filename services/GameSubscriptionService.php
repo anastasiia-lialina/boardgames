@@ -1,21 +1,32 @@
 <?php
 
-
 namespace app\services;
 
-use app\models\game\Game;
 use app\models\game\GameSubscription;
-use Exception;
-use Throwable;
-use Yii;
-use yii\db\StaleObjectException;
-use yii\web\NotFoundHttpException;
+use app\models\search\GameSubscriptionSearch;
+use yii\base\Exception;
+use yii\data\ActiveDataProvider;
 
 /**
  * Сервис для управления подписками на игры
  */
-class GameSubscriptionService
+class GameSubscriptionService extends BaseService
 {
+    public function getSubscriptionProvider(array $params, ?int $userId = null): ActiveDataProvider
+    {
+        $searchModel = new GameSubscriptionSearch();
+        return $searchModel->search($params, $userId);
+    }
+
+    public function findSubscription(int $userId, int $gameId): ?GameSubscription
+    {
+        return GameSubscription::findOne(['user_id' => $userId, 'game_id' => $gameId]);
+    }
+
+    public function findSubscriptionById(int $id): GameSubscription
+    {
+        return $this->findModel(GameSubscription::class, $id);
+    }
     /**
      * Подписка пользователя на игру
      *
@@ -25,157 +36,85 @@ class GameSubscriptionService
      * @throws \yii\base\Exception При ошибке
      * @throws Exception
      */
+    public function isSubscribed(int $userId, int $gameId): bool
+    {
+        $subscription = $this->findSubscription($userId, $gameId);
+        return $subscription && $subscription->is_active === GameSubscription::STATUS_ACTIVE;
+    }
+
     public function subscribe(int $userId, int $gameId): bool
     {
-        // Проверяем, не подписан ли уже пользователь
         $existing = $this->findSubscription($userId, $gameId);
 
         if ($existing) {
-            // Если подписка неактивна — активируем её
-            if (!$existing->is_active) {
-                $existing->is_active = true;
-                return $existing->save(false, ['is_active']);
+            if ($existing->is_active) {
+                return true; // Уже подписан
             }
-            return true; // Уже подписан
+
+            $existing->is_active = GameSubscription::STATUS_ACTIVE;
+            return $existing->save(false, ['is_active']);
         }
 
         $subscription = new GameSubscription();
         $subscription->user_id = $userId;
         $subscription->game_id = $gameId;
-        $subscription->is_active = true;
+        $subscription->is_active = GameSubscription::STATUS_ACTIVE;
 
-        return $subscription->save();
-    }
-
-    /**
-     * Отписка пользователя от игры
-     *
-     * @param int $userId ID пользователя
-     * @param int $gameId ID игры
-     * @return bool Успешность операции
-     * @throws \yii\base\Exception При ошибке
-     * @throws Exception
-     */
-    public function unsubscribe(int $userId, int $gameId): bool
-    {
-        $subscription = $this->findSubscription($userId, $gameId);
-
-        if ($subscription) {
-            $subscription->is_active = false;
-            return $subscription->save(false, ['is_active']);
+        if (!$subscription->save()) {
+            throw new Exception($this->formatValidationErrors($subscription));
         }
 
         return true;
     }
 
-    /**
-     * Получение подписки пользователя на игру
-     *
-     * @param int $userId ID пользователя
-     * @param int $gameId ID игры
-     * @return GameSubscription|null Подписка, если не найдена - null
-     */
-    public function findSubscription(int $userId, int $gameId): ?GameSubscription
+    public function unsubscribe(int $userId, int $gameId): bool
     {
-        return GameSubscription::find()
-            ->where(['user_id' => $userId, 'game_id' => $gameId])
-            ->one();
-    }
+        $subscription = $this->findSubscription($userId, $gameId);
 
-    /**
-     * Переключение статуса подписки
-     *
-     * @param int $id
-     * @return bool Успешность операции
-     * @throws \yii\db\Exception
-     */
-    public function toggleSubscription(int $id): bool
-    {
-        $subscription = GameSubscription::findOne($id);
-
-        if ($subscription) {
-            $subscription->is_active = !$subscription->is_active;
-
-            return $subscription->save(false, ['is_active']);
+        if (!$subscription || !$subscription->is_active) {
+            return true; // Уже не подписан
         }
 
-        throw new Exception('The requested subscription does not exist.');
+        $subscription->is_active = GameSubscription::STATUS_INACTIVE;
+        return $subscription->save(false, ['is_active']);
     }
 
-    /**
-     * Получение всех подписок пользователя
-     *
-     * @param int $userId ID пользователя
-     * @param bool $onlyActive Только активные (по умолчанию: да)
-     * @return GameSubscription[]
-     */
-    public function getUserSubscriptions(int $userId, bool $onlyActive = true): array
+    public function deleteSubscription(int $id): bool
     {
-        $query = GameSubscription::find()
-            ->where(['user_id' => $userId])
-            ->joinWith(['game'])
-            ->orderBy(['created_at' => SORT_DESC]);
-
-        if ($onlyActive) {
-            $query->andWhere(['is_active' => true]);
-        }
-
-        return $query->all();
+        $subscription = $this->findSubscriptionById($id);
+        return $subscription->delete() !== false;
     }
 
-    /**
-     * Проверка подписки пользователя на игру
-     *
-     * @param int $userId ID пользователя
-     * @param int $gameId ID игры
-     * @return bool
-     */
-    public function isSubscribed(int $userId, int $gameId): bool
+    public function getUserSubscriptions(int $userId): array
     {
         return GameSubscription::find()
-            ->where(['user_id' => $userId, 'game_id' => $gameId, 'is_active' => true])
-            ->exists();
+            ->with(['game'])
+            ->where(['user_id' => $userId, 'is_active' => GameSubscription::STATUS_ACTIVE])
+            ->all();
     }
 
-    /**
-     * Получение количества подписчиков игры
-     *
-     * @param int $gameId ID игры
-     * @return int
-     */
-    public function getSubscriberCount(int $gameId): int
+    public function getGameSubscribers(int $gameId): array
     {
         return GameSubscription::find()
-            ->where(['game_id' => $gameId, 'is_active' => true])
+            ->with(['user'])
+            ->where(['game_id' => $gameId, 'is_active' => GameSubscription::STATUS_ACTIVE])
+            ->all();
+    }
+
+    public function getSubscriptionStats(int $gameId): array
+    {
+        $total = GameSubscription::find()
+            ->where(['game_id' => $gameId])
             ->count();
-    }
 
-    /**
-     * Получение всех подписчиков игры
-     *
-     * @param int $gameId ID игры
-     * @return array Массив ID пользователей
-     */
-    public function getSubscribers(int $gameId): array
-    {
-        return GameSubscription::find()
-            ->select('user_id')
-            ->where(['game_id' => $gameId, 'is_active' => true])
-            ->column();
-    }
+        $active = GameSubscription::find()
+            ->where(['game_id' => $gameId, 'is_active' => GameSubscription::STATUS_ACTIVE])
+            ->count();
 
-    /**
-     * @throws StaleObjectException
-     * @throws Throwable
-     */
-    public function delete($id): bool|int
-    {
-        $subscription = GameSubscription::findOne($id);
-
-        if ($subscription === null) {
-            return true;
-        }
-
-        return $subscription->delete();
+        return [
+            'total_subscriptions' => $total,
+            'active_subscriptions' => $active,
+            'inactive_subscriptions' => $total - $active,
+        ];
     }
 }

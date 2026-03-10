@@ -2,13 +2,11 @@
 
 namespace app\commands;
 
-use app\models\game\GameSession;
 use app\services\GameSessionService;
 use Throwable;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\helpers\BaseConsole;
-use yii\helpers\Console;
 
 /**
  * Управление игровыми сессиями

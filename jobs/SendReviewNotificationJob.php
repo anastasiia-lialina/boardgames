@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace app\jobs;
 
+use app\notifications\ReviewNotification;
 use Yii;
 use yii\base\BaseObject;
 use yii\queue\RetryableJobInterface;
-use app\notifications\ReviewNotification;
 
 class SendReviewNotificationJob extends BaseObject implements RetryableJobInterface
 {
@@ -27,9 +27,9 @@ class SendReviewNotificationJob extends BaseObject implements RetryableJobInterf
         Yii::info("Уведомление об одобренном отзыве для User {$this->userId} ---", 'queue');
 
         ReviewNotification::create($this->gameId, [
-            'userId'   => $this->userId,
+            'userId' => $this->userId,
             'gameName' => $this->gameName,
-            'isApproved'   => $this->isApproved,
+            'isApproved' => $this->isApproved,
         ])->send();
 
         Yii::info("Уведомление об отзыве отправлено", 'queue');

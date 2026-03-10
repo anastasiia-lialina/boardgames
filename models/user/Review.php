@@ -28,8 +28,8 @@ class Review extends ActiveRecord
     public const MAX_RATING = 5;
     public const MAX_COMMENT_LENGTH = 1000;
 
-    const STATUS_APPROVED = 'approved';
-    const STATUS_REJECTED = 'rejected';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
 
     /**
      * {@inheritdoc}
@@ -47,7 +47,7 @@ class Review extends ActiveRecord
                 'updatedAtAttribute' => false,
                 'value' => new Expression('NOW()'),
             ],
-            'blameable' => [
+            'blamable' => [
                 'class' => BlameableBehavior::class,
                 'updatedByAttribute' => false,
                 'createdByAttribute' => 'user_id',

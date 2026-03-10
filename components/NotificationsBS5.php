@@ -2,9 +2,9 @@
 
 namespace app\components;
 
+use webzop\notifications\widgets\Notifications;
 use Yii;
 use yii\helpers\Html;
-use webzop\notifications\widgets\Notifications;
 
 /**
  * Bootstrap 5 компонент уведомлений
@@ -20,7 +20,7 @@ class NotificationsBS5 extends Notifications
         $badge = Html::tag('span', $count, [
             'class' => 'badge rounded-pill bg-danger notifications-count',
             'data-count' => $count,
-            'style' => $count > 0 ? '' : 'display: none;'
+            'style' => $count > 0 ? '' : 'display: none;',
         ]);
 
         $hidden = Html::tag('div', '', ['class' => 'notifications-list d-none']);

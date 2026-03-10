@@ -2,10 +2,9 @@
 
 namespace app\services;
 
+use app\jobs\SendGameNotificationJob;
 use app\models\forms\GameSessionForm;
 use app\models\game\GameSession;
-use app\models\game\GameSubscription;
-use app\jobs\SendGameNotificationJob;
 use Yii;
 use yii\base\Exception;
 use yii\db\Expression;
@@ -16,7 +15,7 @@ use yii\web\NotFoundHttpException;
 /**
  * Сервис для управления игровыми сессиями
  */
-class GameSessionService
+class GameSessionService extends BaseService
 {
     /**
      * Создание новой игровой сессии
@@ -93,14 +92,14 @@ class GameSessionService
         $session = GameSession::findOne($sessionId);
 
         if (!$session) {
-            throw new Exception('Сессия не найдена');
+            throw new Exception(Yii::t('app', 'Session not found.'));
         }
 
         $oldStatus = $session->status;
         $session->status = $newStatus;
 
         if (!$session->save()) {
-            throw new Exception('Не удалось обновить статус сессии');
+            throw new Exception(Yii::t('app', 'Failed to update session status.'));
         }
 
         $this->handleStatusChange($session, $oldStatus, $newStatus);
@@ -144,7 +143,7 @@ class GameSessionService
         $session = GameSession::findOne($sessionId);
 
         if (!$session) {
-            throw new Exception('Сессия не найдена');
+            throw new Exception(Yii::t('app', 'Session not found.'));
         }
 
         return $session;
@@ -265,13 +264,6 @@ class GameSessionService
      * @param GameSession $session The GameSession object to load data into
      * @param GameSessionForm $form The GameSessionForm object containing the data to load
      */
-    private function load(GameSession $session, GameSessionForm $form): void
-    {
-        $session->game_id = $form->game_id;
-        $session->scheduled_at = $form->scheduled_at;
-        $session->max_participants = $form->max_participants;
-        $session->status = $form->status;
-    }
 
     /**
      * Поиск количества просроченных сессий
