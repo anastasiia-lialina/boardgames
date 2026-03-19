@@ -6,7 +6,6 @@ namespace app\jobs;
 
 use app\models\game\GameSubscription;
 use app\notifications\SessionNotification;
-use Yii;
 use yii\base\BaseObject;
 use yii\queue\RetryableJobInterface;
 
@@ -24,19 +23,17 @@ class SendGameNotificationJob extends BaseObject implements RetryableJobInterfac
 
     public int $ttr = 300;
 
-    /**
-     * @inheritdoc
-     */
-    public function execute($queue)
+    public function execute($queue): void
     {
-        Yii::info("Старт рассылки: GameId {$this->gameId}", 'queue');
+        \Yii::info("Старт рассылки: GameId {$this->gameId}", 'queue');
 
         $subscriptions = GameSubscription::find()
             ->where(['game_id' => $this->gameId])
             ->andWhere(['is_active' => GameSubscription::STATUS_ACTIVE])
-            ->all();
+            ->all()
+        ;
 
-        Yii::info("Найдено подписок: " . count($subscriptions), 'queue');
+        \Yii::info('Найдено подписок: ' . count($subscriptions), 'queue');
 
         foreach ($subscriptions as $sub) {
             SessionNotification::create($this->sessionId, [
@@ -44,30 +41,26 @@ class SendGameNotificationJob extends BaseObject implements RetryableJobInterfac
                 'gameName' => $sub->game->title,
                 'sessionDate' => $this->sessionDate,
                 'statusLabel' => $this->statusLabel,
-                ])->send();
+            ])->send();
         }
-        Yii::info("Рассылка завершена. Отправлено уведомлений: " . count($subscriptions), 'queue');
+        \Yii::info('Рассылка завершена. Отправлено уведомлений: ' . count($subscriptions), 'queue');
     }
 
     /**
-     * @inheritdoc
-     * Максимальное количество попыток
+     * {@inheritdoc}
+     * Максимальное количество попыток.
      */
-    public function getTtr()
+    public function getTtr(): int
     {
         return $this->ttr;
     }
 
-    /**
-     * @inheritdoc
-     * Время до следующей попытки
-     */
-    public function getDelay($attempt, $exception)
+    public function getDelay($attempt, $exception): float|int
     {
-        return (60 * pow(2, $attempt - 1));
+        return 60 * pow(2, $attempt - 1);
     }
 
-    public function canRetry($attempt, $error)
+    public function canRetry($attempt, $error): bool
     {
         return $attempt < $this->maxAttempts;
     }

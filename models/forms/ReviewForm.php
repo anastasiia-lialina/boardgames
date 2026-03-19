@@ -3,7 +3,6 @@
 namespace app\models\forms;
 
 use app\models\user\Review;
-use Yii;
 
 class ReviewForm extends Review
 {
@@ -24,7 +23,7 @@ class ReviewForm extends Review
                 ['user_id', 'game_id'],
                 'unique',
                 'targetAttribute' => ['user_id', 'game_id'],
-                'message' => Yii::t('app', 'You have already left a review for this game.'),
+                'message' => \Yii::t('app', 'You have already left a review for this game.'),
             ],
         ];
     }

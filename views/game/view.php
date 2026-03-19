@@ -33,11 +33,11 @@ $reviewCount = $reviewService->getReviewsCount($model->id);
         <?php if (Yii::$app->user->can('manageGames')): ?>
             <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
             <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
-                    'class' => 'btn btn-danger',
-                    'data' => [
-                            'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                            'method' => 'post',
-                    ],
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                    'method' => 'post',
+                ],
             ]) ?>
         <?php endif; ?>
     </p>
@@ -63,38 +63,38 @@ $reviewCount = $reviewService->getReviewsCount($model->id);
     <?php endif; ?>
 
     <?= DetailView::widget([
-            'model' => $model,
-            'attributes' => [
-                    'id',
-                    'title',
-                    'description:ntext',
-                    [
-                            'attribute' => 'players_min',
-                            'label' => Yii::t('app', 'Players'),
-                            'value' => Yii::t('app', '{min}–{max} players', [
-                                    'min' => $model->players_min,
-                                    'max' => $model->players_max,
-                            ]),
-                    ],
-                    [
-                            'attribute' => 'duration_min',
-                            'label' => Yii::t('app', 'Duration'),
-                            'value' => Yii::t('app', 'From {n} min.', ['n' => $model->duration_min]),
-                    ],
-                    [
-                            'attribute' => 'complexity',
-                            'value' => $model->complexity . '/5',
-                    ],
-                    'year',
-                    'created_at',
-                    [
-                            'attribute' => 'averageRating',
-                            'label' => Yii::t('app', 'Average Rating'),
-                            'format' => 'raw',
-                            'value' => $reviewService->getAverageRating($model->id) . '/5' .
-                                    ' (' . Yii::t('app', '{n, plural, =0{No reviews} one{# review} few{# reviews} many{# reviews} other{# reviews}}', ['n' => $reviewCount]) . ')',
-                    ],
+        'model' => $model,
+        'attributes' => [
+            'id',
+            'title',
+            'description:ntext',
+            [
+                'attribute' => 'players_min',
+                'label' => Yii::t('app', 'Players'),
+                'value' => Yii::t('app', '{min}–{max} players', [
+                    'min' => $model->players_min,
+                    'max' => $model->players_max,
+                ]),
             ],
+            [
+                'attribute' => 'duration_min',
+                'label' => Yii::t('app', 'Duration'),
+                'value' => Yii::t('app', 'From {n} min.', ['n' => $model->duration_min]),
+            ],
+            [
+                'attribute' => 'complexity',
+                'value' => $model->complexity . '/5',
+            ],
+            'year',
+            'created_at',
+            [
+                'attribute' => 'averageRating',
+                'label' => Yii::t('app', 'Average Rating'),
+                'format' => 'raw',
+                'value' => $reviewService->getAverageRating($model->id) . '/5'
+                        . ' (' . Yii::t('app', '{n, plural, =0{No reviews} one{# review} few{# reviews} many{# reviews} other{# reviews}}', ['n' => $reviewCount]) . ')',
+            ],
+        ],
     ]) ?>
 
 
@@ -104,10 +104,10 @@ $reviewCount = $reviewService->getReviewsCount($model->id);
         <?php Pjax::begin(['id' => 'sessions-pjax']); ?>
 
         <?= ListView::widget([
-                'dataProvider' => $sessionsDataProvider,
-                'itemView' => '_session_item',
-                'layout' => "{items}\n{pager}",
-                'options' => ['class' => 'list-view sessions-list'],
+            'dataProvider' => $sessionsDataProvider,
+            'itemView' => '_session_item',
+            'layout' => "{items}\n{pager}",
+            'options' => ['class' => 'list-view sessions-list'],
         ]) ?>
 
         <?php Pjax::end(); ?>
@@ -121,10 +121,10 @@ $reviewCount = $reviewService->getReviewsCount($model->id);
         <?php Pjax::begin(['id' => 'reviews-pjax']); ?>
 
         <?= ListView::widget([
-                'dataProvider' => $reviewsDataProvider,
-                'itemView' => '_review_item',
-                'layout' => "{summary}\n{items}\n{pager}",
-                'options' => ['class' => 'list-view reviews-list'],
+            'dataProvider' => $reviewsDataProvider,
+            'itemView' => '_review_item',
+            'layout' => "{summary}\n{items}\n{pager}",
+            'options' => ['class' => 'list-view reviews-list'],
         ]) ?>
 
         <?php Pjax::end(); ?>
@@ -136,7 +136,7 @@ $reviewCount = $reviewService->getReviewsCount($model->id);
         <div class="review-form mt-4 bg-light p-3 rounded">
             <h2><?= Yii::t('app', 'Leave a Review') ?></h2>
             <?php $form = ActiveForm::begin([
-                    'fieldConfig' => ['errorOptions' => ['class' => 'invalid-feedback d-block']],
+                'fieldConfig' => ['errorOptions' => ['class' => 'invalid-feedback d-block']],
             ]); ?>
 
             <?= $form->field($reviewForm, 'rating')->dropDownList(RatingHelper::getRatingOptions(), ['prompt' => Yii::t('app', 'Choose rating...')]) ?>
@@ -152,8 +152,8 @@ $reviewCount = $reviewService->getReviewsCount($model->id);
     <?php elseif (Yii::$app->user->isGuest): ?>
         <p class="text-muted">
             <?= Yii::t('app', 'To leave a review, please {login} or {signup}.', [
-                    'login' => Html::a(Yii::t('app', 'log in'), ['site/login']),
-                    'signup' => Html::a(Yii::t('app', 'register'), ['site/signup']),
+                'login' => Html::a(Yii::t('app', 'log in'), ['site/login']),
+                'signup' => Html::a(Yii::t('app', 'register'), ['site/signup']),
             ]) ?>
         </p>
     <?php endif; ?>

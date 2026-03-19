@@ -22,7 +22,7 @@ class GameSubscriptionSearch extends GameSubscription
         return Model::scenarios();
     }
 
-    public function search($params, $userId)
+    public function search($params, int $userId): ActiveDataProvider
     {
         $query = GameSubscription::find()->where(['user_id' => $userId])->joinWith(['game']);
 

@@ -3,7 +3,6 @@
 namespace app\models\user;
 
 use app\models\game\Game;
-use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -17,10 +16,9 @@ use yii\db\Expression;
  * @property int $game_id Ид игры
  * @property int $user_id Ид пользователя оставившего отзыв
  * @property int $rating Рейтинг (1-5)
- * @property string|null $comment Отзыв
+ * @property null|string $comment Отзыв
  * @property bool $is_approved Статус модерации
  * @property string $created_at Дата добавления
- *
  */
 class Review extends ActiveRecord
 {
@@ -28,12 +26,10 @@ class Review extends ActiveRecord
     public const MAX_RATING = 5;
     public const MAX_COMMENT_LENGTH = 1000;
 
-    public const STATUS_APPROVED = 'approved';
-    public const STATUS_REJECTED = 'rejected';
+    public const EVENT_MODERATION_NEEDED = 'moderationNeeded';
+    public const EVENT_APPROVED = 'approved';
+    public const EVENT_REJECTED = 'rejected';
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName(): string
     {
         return '{{%reviews}}';
@@ -55,9 +51,6 @@ class Review extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -78,35 +71,30 @@ class Review extends ActiveRecord
                 ['user_id', 'game_id'],
                 'unique',
                 'targetAttribute' => ['user_id', 'game_id'],
-                'message' => Yii::t('app', 'You have already left a review for this game.'),
+                'message' => \Yii::t('app', 'You have already left a review for this game.'),
             ],
 
             [['game_id'], 'exist', 'skipOnError' => true, 'targetClass' => Game::class, 'targetAttribute' => ['game_id' => 'id']],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels(): array
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'game_id' => Yii::t('app', 'Game'),
-            'user_id' => Yii::t('app', 'User'),
-            'rating' => Yii::t('app', 'Rating'),
-            'comment' => Yii::t('app', 'Comment'),
-            'is_approved' => Yii::t('app', 'Is Approved'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'username' => Yii::t('app', 'User'),
-            'gameTitle' => Yii::t('app', 'Game'),
+            'id' => \Yii::t('app', 'ID'),
+            'game_id' => \Yii::t('app', 'Game'),
+            'user_id' => \Yii::t('app', 'User'),
+            'rating' => \Yii::t('app', 'Rating'),
+            'comment' => \Yii::t('app', 'Comment'),
+            'is_approved' => \Yii::t('app', 'Is Approved'),
+            'created_at' => \Yii::t('app', 'Created At'),
+            'username' => \Yii::t('app', 'User'),
+            'gameTitle' => \Yii::t('app', 'Game'),
         ];
     }
 
     /**
      * Gets query for [[Game]].
-     *
-     * @return ActiveQuery
      */
     public function getGame(): ActiveQuery
     {

@@ -3,7 +3,6 @@
 namespace app\models\game;
 
 use app\models\user\Review;
-use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -15,14 +14,13 @@ use yii\db\Expression;
  *
  * @property int $id
  * @property string $title Название
- * @property string|null $description Описание
+ * @property null|string $description Описание
  * @property int $players_min Минимальное количество игроков
  * @property int $players_max Максимальное количество игроков
  * @property int $duration_min Минимальное время игры(мин.)
  * @property float $complexity Сложность
  * @property int $year Год выпуска
  * @property string $created_at Дата добавления
- *
  * @property GameSession[] $gameSessions
  * @property Review[] $reviews
  */
@@ -35,9 +33,6 @@ class Game extends ActiveRecord
     public const MAX_COMPLEXITY = 5.0;
     public const MIN_YEAR = 1900;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName(): string
     {
         return '{{%games}}';
@@ -54,9 +49,6 @@ class Game extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -82,26 +74,23 @@ class Game extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels(): array
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'title' => Yii::t('app', 'Title'),
-            'description' => Yii::t('app', 'Description'),
-            'players_min' => Yii::t('app', 'Min. players'),
-            'players_max' => Yii::t('app', 'Max. players'),
-            'duration_min' => Yii::t('app', 'Duration (min.)'),
-            'complexity' => Yii::t('app', 'Complexity'),
-            'year' => Yii::t('app', 'Year'),
-            'created_at' => Yii::t('app', 'Created At'),
+            'id' => \Yii::t('app', 'ID'),
+            'title' => \Yii::t('app', 'Title'),
+            'description' => \Yii::t('app', 'Description'),
+            'players_min' => \Yii::t('app', 'Min. players'),
+            'players_max' => \Yii::t('app', 'Max. players'),
+            'duration_min' => \Yii::t('app', 'Duration (min.)'),
+            'complexity' => \Yii::t('app', 'Complexity'),
+            'year' => \Yii::t('app', 'Year'),
+            'created_at' => \Yii::t('app', 'Created At'),
         ];
     }
 
     /**
-     * Получить все отзывы
+     * Получить все отзывы.
      */
     public function getReviews(): ActiveQuery
     {
@@ -109,7 +98,7 @@ class Game extends ActiveRecord
     }
 
     /**
-     * Получить все сессии
+     * Получить все сессии.
      */
     public function getSessions(): ActiveQuery
     {
@@ -117,18 +106,21 @@ class Game extends ActiveRecord
     }
 
     /**
-     * Получить предстоящие сессии
+     * Получить предстоящие сессии.
      */
     public function getUpcomingSessions(): ActiveQuery
     {
         return $this->hasMany(GameSession::class, ['game_id' => 'id'])
             ->where(['>=', 'scheduled_at', date('Y-m-d H:i:s')])
             ->andWhere(['status' => GameSession::STATUS_PLANNED])
-            ->orderBy(['scheduled_at' => SORT_ASC]);
+            ->orderBy(['scheduled_at' => SORT_ASC])
+        ;
     }
 
     /**
-     * Получить список одобренных отзывов отсортированный и с пагинацией
+     * Получить список одобренных отзывов отсортированный и с пагинацией.
+     *
+     * @param mixed $pageSize
      */
     public function getReviewsDataProvider($pageSize = 2): ActiveDataProvider
     {
@@ -146,12 +138,13 @@ class Game extends ActiveRecord
     }
 
     /**
-     * Получить все одобренные отзывы
+     * Получить все одобренные отзывы.
      */
     public function getApprovedReviews(): ActiveQuery
     {
         return $this->hasMany(Review::class, ['game_id' => 'id'])
             ->where(['is_approved' => true])
-            ->orderBy(['created_at' => SORT_DESC]);
+            ->orderBy(['created_at' => SORT_DESC])
+        ;
     }
 }

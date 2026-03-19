@@ -6,18 +6,30 @@ use app\models\game\Game;
 use app\models\game\GameSession;
 use app\models\user\Review;
 use app\models\user\User;
-use Yii;
+use app\services\UserService;
+use yii\base\InvalidConfigException;
 use yii\console\Controller;
+use yii\db\Exception;
+use yii\helpers\ArrayHelper;
 
 /**
- * Controller для генерации тестовых данных
+ * Controller для генерации тестовых данных.
  */
 class SeedController extends Controller
 {
+    public function __construct(
+        $id,
+        $module,
+        private readonly UserService $userService,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+    }
+
     /**
-     * Генерация юзеров
+     * Генерация юзеров.
      */
-    public function actionUsers()
+    public function actionUsers(): void
     {
         $usersData = [
             [
@@ -49,9 +61,10 @@ class SeedController extends Controller
         $created = 0;
         foreach ($usersData as $data) {
             // Проверяем, не существует ли пользователь
-            $existing = User::findByUsername($data['username']);
+            $existing = $this->userService->findByUsername($data['username']);
             if ($existing) {
                 $this->stdout("Пользователь {$data['username']} уже существует\n");
+
                 continue;
             }
 
@@ -63,11 +76,11 @@ class SeedController extends Controller
             $user->status = User::STATUS_ACTIVE;
 
             if ($user->save()) {
-                $created++;
+                ++$created;
                 $this->stdout("Создан пользователь: {$user->username} ({$data['role']})\n");
 
                 // Назначаем роль
-                $auth = Yii::$app->authManager;
+                $auth = \Yii::$app->authManager;
                 $role = $auth->getRole($data['role']);
                 if ($role) {
                     $auth->assign($role, $user->id);
@@ -79,13 +92,13 @@ class SeedController extends Controller
             }
         }
 
-        $this->stdout("\n Создано пользователей: $created из " . count($usersData) . "\n");
+        $this->stdout("\n Создано пользователей: {$created} из " . count($usersData) . "\n");
     }
 
     /**
      * Генерация игр
      */
-    public function actionGames($count = 10)
+    public function actionGames(): void
     {
         $gamesData = [
             [
@@ -186,7 +199,7 @@ class SeedController extends Controller
             $game->attributes = $data;
 
             if ($game->save()) {
-                $created++;
+                ++$created;
                 $this->stdout("Создана игра: {$game->title}\n");
             } else {
                 $this->stderr("Ошибка создания: {$game->title}\n");
@@ -194,19 +207,24 @@ class SeedController extends Controller
             }
         }
 
-        $this->stdout("\n Создано игр: $created из " . count($gamesData) . "\n");
+        $this->stdout("\n Создано игр: {$created} из " . count($gamesData) . "\n");
     }
 
     /**
-     * Генерация отзывов
+     * Генерация отзывов.
+     *
+     * @return int|void
+     *
+     * @throws Exception
      */
-    public function actionReviews($count = 20)
+    public function actionReviews(int $count = 20)
     {
         $games = Game::find()->all();
         $userIds = $this->getUserIds();
 
         if (empty($games)) {
             $this->stderr("Нет игр в базе. Сначала создайте игры: yii seed/games\n");
+
             return 1;
         }
 
@@ -226,7 +244,7 @@ class SeedController extends Controller
         $created = 0;
         $approved = 0;
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $game = $games[array_rand($games)];
             $reviewData = $reviewsData[array_rand($reviewsData)];
 
@@ -239,9 +257,9 @@ class SeedController extends Controller
             $review->is_approved = (rand(0, 10) > 3); // 70% одобрено
 
             if ($review->save()) {
-                $created++;
+                ++$created;
                 if ($review->is_approved) {
-                    $approved++;
+                    ++$approved;
                 }
                 $this->stdout("Отзыв #{$review->id} к \"{$game->title}\" ({$review->rating}) " . ($review->is_approved ? '[одобрен]' : '[на модерации]') . "\n");
             } else {
@@ -249,18 +267,24 @@ class SeedController extends Controller
             }
         }
 
-        $this->stdout("\n Создано отзывов: $created (одобрено: $approved)\n");
+        $this->stdout("\n Создано отзывов: {$created} (одобрено: {$approved})\n");
     }
 
     /**
-     * Генерация игровых сессий
+     * Генерация игровых сессий.
+     *
+     * @return int|void
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
      */
-    public function actionSessions($count = 5)
+    public function actionSessions(int $count = 5)
     {
         $games = Game::find()->all();
 
         if (empty($games)) {
             $this->stderr("Нет игр в базе. Сначала создайте игры: yii seed/games\n");
+
             return 1;
         }
 
@@ -268,34 +292,37 @@ class SeedController extends Controller
 
         $userIds = $this->getUserIds();
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $game = $games[array_rand($games)];
 
             $session = new GameSession();
             $session->game_id = $game->id;
             $session->organizer_id = $userIds[array_rand($userIds)];
             $session->scheduled_at = (new \DateTime())->modify('+5 days')->format('d.m.Y H:i');
-            ;
+
             $session->max_participants = rand(3, 8);
             $session->status = GameSession::STATUS_PLANNED;
 
             if ($session->save()) {
-                $created++;
-                $date = Yii::$app->formatter->asDate($session->scheduled_at, 'php:d.m.Y');
-                $this->stdout("Сессия #{$session->id}: \"{$game->title}\" на $date ({$session->max_participants} игроков)\n");
+                ++$created;
+                $date = \Yii::$app->formatter->asDate($session->scheduled_at, 'php:d.m.Y');
+                $this->stdout("Сессия #{$session->id}: \"{$game->title}\" на {$date} ({$session->max_participants} игроков)\n");
             } else {
                 $this->stderr("Ошибка создания сессии\n");
                 $this->stderr(implode(', ', $session->getFirstErrors()) . "\n");
             }
         }
 
-        $this->stdout("\n Создано сессий: $created\n");
+        $this->stdout("\n Создано сессий: {$created}\n");
     }
 
     /**
-     * Генерация всех тестовых данных
+     * Генерация всех тестовых данных.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
      */
-    public function actionAll()
+    public function actionAll(): void
     {
         $this->stdout("=== Генерация тестовых данных ===\n\n");
 
@@ -321,7 +348,7 @@ class SeedController extends Controller
 
     public function getUserIds(): array
     {
-        return \yii\helpers\ArrayHelper::getColumn(
+        return ArrayHelper::getColumn(
             User::find()
                 ->select('id')
                 ->asArray()

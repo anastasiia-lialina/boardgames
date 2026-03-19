@@ -24,7 +24,6 @@ class RatingHelper
 
     /**
      * Рендерит звёздочки рейтинга
-     * @param float|int $rating
      * @param int $max Максимальное количество звезд
      * @return string HTML-строка
      */

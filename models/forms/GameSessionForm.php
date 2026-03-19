@@ -4,8 +4,6 @@ namespace app\models\forms;
 
 use app\models\game\Game;
 use app\models\game\GameSession;
-use DateTime;
-use Yii;
 
 class GameSessionForm extends GameSession implements Form
 {
@@ -48,20 +46,23 @@ class GameSessionForm extends GameSession implements Form
 
     public function validateScheduledAt($attribute, $params): void
     {
-        $scheduled = new DateTime($this->$attribute);
-        $now = new DateTime();
+        $scheduled = new \DateTime($this->{$attribute});
+        $now = new \DateTime();
 
         switch (true) {
-            case $this->status === self::STATUS_PLANNED && $scheduled <= $now:
-                $this->addError($attribute, Yii::t('app', 'The scheduled date must be in the future.'));
+            case self::STATUS_PLANNED === $this->status && $scheduled <= $now:
+                $this->addError($attribute, \Yii::t('app', 'The scheduled date must be in the future.'));
+
                 break;
 
-            case $this->status === self::STATUS_ACTIVE && $scheduled > $now:
-                $this->addError($attribute, Yii::t('app', 'An active session must have already started.'));
+            case self::STATUS_ACTIVE === $this->status && $scheduled > $now:
+                $this->addError($attribute, \Yii::t('app', 'An active session must have already started.'));
+
                 break;
 
-            case $this->status === self::STATUS_COMPLETED && $scheduled >= $now:
-                $this->addError($attribute, Yii::t('app', 'A completed session must be in the past.'));
+            case self::STATUS_COMPLETED === $this->status && $scheduled >= $now:
+                $this->addError($attribute, \Yii::t('app', 'A completed session must be in the past.'));
+
                 break;
         }
     }

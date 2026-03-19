@@ -13,9 +13,7 @@ class GameSessionSearch extends GameSession
 {
     public $gameTitle;
     public $organizerUsername;
-    /**
-     * {@inheritdoc}
-     */
+
     public function rules()
     {
         return [
@@ -24,9 +22,6 @@ class GameSessionSearch extends GameSession
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class
@@ -34,14 +29,11 @@ class GameSessionSearch extends GameSession
     }
 
     /**
-     * Creates data provider instance with search query applied
+     * Creates data provider instance with search query applied.
      *
-     * @param array $params
-     * @param string|null $formName Form name to be used into `->load()` method.
-     *
-     * @return ActiveDataProvider
+     * @param null|string $formName form name to be used into `->load()` method
      */
-    public function search($params, $formName = null)
+    public function search(array $params, ?string $formName = null): ActiveDataProvider
     {
         $query = GameSession::find()->joinWith(['game', 'organizer']);
 
@@ -77,7 +69,6 @@ class GameSessionSearch extends GameSession
             return $dataProvider;
         }
 
-        // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
             'game_id' => $this->game_id,
@@ -88,7 +79,6 @@ class GameSessionSearch extends GameSession
         ]);
 
         $query->andFilterWhere(['like', 'game_sessions.status', $this->status]);
-        // Фильтрация по названию игры
         $query->andFilterWhere(['like', 'games.title', $this->gameTitle]);
         $query->andFilterWhere(['like', 'user.username', $this->organizerUsername]);
 
@@ -96,19 +86,16 @@ class GameSessionSearch extends GameSession
     }
 
     /**
-     * Получить предстоящие сессии для конкретной игры
-     *
-     * @param int $gameId
-     * @param int $pageSize
-     * @return ActiveDataProvider
+     * Получить предстоящие сессии для конкретной игры.
      */
-    public function getUpcomingSessionsForGame($gameId, $pageSize = 2)
+    public function getUpcomingSessionsForGame(int $gameId, int $pageSize = 2): ActiveDataProvider
     {
         $query = self::find()
             ->where(['>=', 'scheduled_at', date('Y-m-d H:i:s')])
             ->andWhere(['status' => self::STATUS_PLANNED])
             ->andWhere(['game_id' => $gameId])
-            ->orderBy(['scheduled_at' => SORT_ASC]);
+            ->orderBy(['scheduled_at' => SORT_ASC])
+        ;
 
         return new ActiveDataProvider([
             'query' => $query,

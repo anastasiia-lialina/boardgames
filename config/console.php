@@ -1,12 +1,16 @@
 <?php
 
+use app\bootstrap\EventBootstrap;
+use yii\queue\amqp_interop\Queue;
+use yii\queue\LogBehavior;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'queue'],
+    'bootstrap' => ['log', 'queue', EventBootstrap::class],
     'controllerNamespace' => 'app\commands',
     'language' => 'ru-RU',
     'aliases' => [
@@ -50,7 +54,6 @@ $config = [
                     'maxFileSize' => 10240,
                     'maxLogFiles' => 5,
                 ],
-
             ],
         ],
         'db' => $db,
@@ -79,7 +82,7 @@ $config = [
             ],
         ],
         'queue' => [
-            'class' => \yii\queue\amqp_interop\Queue::class,
+            'class' => Queue::class,
             'host' => getenv('RABBITMQ_HOST'),
             'port' => getenv('RABBITMQ_PORT'),
             'user' => getenv('RABBITMQ_USER'),
@@ -88,8 +91,8 @@ $config = [
             'queueName' => 'notifications',
             'exchangeName' => 'notifications_exchange',
             'routingKey' => 'notifications',
-            'driver' => \yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
-            'as log' => \yii\queue\LogBehavior::class,
+            'driver' => Queue::ENQUEUE_AMQP_LIB,
+            'as log' => LogBehavior::class,
         ],
     ],
     'params' => $params,
@@ -98,7 +101,6 @@ $config = [
         'seed' => 'app\commands\SeedController',
         'session' => 'app\commands\SessionController',
     ],
-
 ];
 
 if (YII_ENV_DEV) {
@@ -113,7 +115,7 @@ if (YII_ENV_DEV) {
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        // 'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 }
 

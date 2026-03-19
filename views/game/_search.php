@@ -3,9 +3,10 @@
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
 
-/** @var yii\web\View $this */
-/** @var \app\models\search\GameSearch $model */
-/** @var yii\bootstrap5\ActiveForm $form */
+/* @var yii\web\View $this
+ * @var \app\models\search\GameSearch $model
+ * @var yii\bootstrap5\ActiveForm $form
+ */
 ?>
 
 <div class="game-search">
@@ -18,27 +19,19 @@ use yii\helpers\Html;
         ],
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
+    <?= $form->field($model, 'id'); ?>
 
-    <?= $form->field($model, 'title') ?>
+    <?= $form->field($model, 'title'); ?>
 
-    <?= $form->field($model, 'description') ?>
+    <?= $form->field($model, 'description'); ?>
 
-    <?= $form->field($model, 'players_min') ?>
+    <?= $form->field($model, 'players_min'); ?>
 
-    <?= $form->field($model, 'players_max') ?>
-
-    <?php // echo $form->field($model, 'duration_min')?>
-
-    <?php // echo $form->field($model, 'complexity')?>
-
-    <?php // echo $form->field($model, 'year')?>
-
-    <?php // echo $form->field($model, 'created_at')?>
+    <?= $form->field($model, 'players_max'); ?>
 
     <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
+        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']); ?>
+        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-outline-secondary']); ?>
     </div>
 
     <?php ActiveForm::end(); ?>

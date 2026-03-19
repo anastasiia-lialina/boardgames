@@ -21,34 +21,34 @@ YiiAsset::register($this);
         <p>
             <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
             <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
-                    'class' => 'btn btn-danger',
-                    'data' => [
-                            'confirm' => Yii::t('app', 'Are you sure you want to delete this session?'),
-                            'method' => 'post',
-                    ],
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => Yii::t('app', 'Are you sure you want to delete this session?'),
+                    'method' => 'post',
+                ],
             ]) ?>
         </p>
     <?php endif; ?>
 
     <?= DetailView::widget([
-            'model' => $model,
-            'attributes' => [
-                    'id',
-                    [
-                            'attribute' => 'game.title',
-                            'label' => Yii::t('app', 'Game'),
-                            'value' => Html::a($model->game->title, ['game/view', 'id' => $model->game_id], ['target' => '_blank']),
-                            'format' => 'raw',
-                    ],
-                    'organizer.username',
-                    'scheduled_at',
-                    'max_participants',
-                    [
-                            'attribute' => 'status',
-                            'value' => $model->statusLabel,
-                    ],
-                    'created_at',
+        'model' => $model,
+        'attributes' => [
+            'id',
+            [
+                'attribute' => 'game.title',
+                'label' => Yii::t('app', 'Game'),
+                'value' => Html::a($model->game->title, ['game/view', 'id' => $model->game_id], ['target' => '_blank']),
+                'format' => 'raw',
             ],
+            'organizer.username',
+            'scheduled_at',
+            'max_participants',
+            [
+                'attribute' => 'status',
+                'value' => $model->statusLabel,
+            ],
+            'created_at',
+        ],
     ]) ?>
 
 </div>

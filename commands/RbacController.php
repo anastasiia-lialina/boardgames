@@ -4,20 +4,19 @@ namespace app\commands;
 
 use app\models\user\User;
 use app\rbac\OrganizerRule;
-use Yii;
 use yii\console\Controller;
 
 /**
- * RBAC controller for initializing roles and permissions
+ * RBAC controller for initializing roles and permissions.
  */
 class RbacController extends Controller
 {
     /**
-     * Initialize RBAC roles and permissions
+     * Initialize RBAC roles and permissions.
      */
-    public function actionInit()
+    public function actionInit(): void
     {
-        $auth = Yii::$app->authManager;
+        $auth = \Yii::$app->authManager;
         $auth->removeAll(); // Полная очистка перед обновлением
 
         // --- RULES---
@@ -72,7 +71,6 @@ class RbacController extends Controller
         $auth->addChild($updateOwnSession, $updateSession);
         $auth->addChild($deleteOwnSession, $deleteSession);
 
-
         $auth->addChild($updateSession, $manageSessions);
         $auth->addChild($deleteSession, $manageSessions);
         $auth->addChild($createSession, $manageSessions);
@@ -80,7 +78,7 @@ class RbacController extends Controller
         // --- РОЛИ ---
 
         // USER
-        $user = $auth->createRole('user');
+        $user = $auth->createRole(User::ROLE_USER);
         $user->description = 'Пользователь';
         $auth->add($user);
         $auth->addChild($user, $createReview);
@@ -89,7 +87,7 @@ class RbacController extends Controller
         $auth->addChild($user, $deleteOwnSession);
 
         // MODERATOR
-        $moderator = $auth->createRole('moderator');
+        $moderator = $auth->createRole(User::ROLE_MODERATOR);
         $moderator->description = 'Модератор';
         $auth->add($moderator);
         $auth->addChild($moderator, $user);
@@ -98,7 +96,7 @@ class RbacController extends Controller
         $auth->addChild($moderator, $deleteSession);
 
         // ADMIN
-        $admin = $auth->createRole('admin');
+        $admin = $auth->createRole(User::ROLE_ADMIN);
         $admin->description = 'Администратор';
         $auth->add($admin);
         $auth->addChild($admin, $moderator);
@@ -114,23 +112,26 @@ class RbacController extends Controller
     }
 
     /**
-     * Assign role to user
+     * Assign role to user.
+     *
      * @param string $roleName
      * @param int $userId
      */
     public function actionAssign($roleName, $userId)
     {
-        $auth = Yii::$app->authManager;
+        $auth = \Yii::$app->authManager;
         $role = $auth->getRole($roleName);
         $user = User::findOne($userId);
 
         if (!$role) {
             $this->stderr("Role '{$roleName}' not found!\n");
+
             return 1;
         }
 
         if (!$user) {
             $this->stderr("User with ID {$userId} not found!\n");
+
             return 1;
         }
 
@@ -141,23 +142,26 @@ class RbacController extends Controller
     }
 
     /**
-     * Revoke role from user
+     * Revoke role from user.
+     *
      * @param string $roleName
      * @param int $userId
      */
     public function actionRevoke($roleName, $userId)
     {
-        $auth = Yii::$app->authManager;
+        $auth = \Yii::$app->authManager;
         $role = $auth->getRole($roleName);
         $user = User::findOne($userId);
 
         if (!$role) {
             $this->stderr("Role '{$roleName}' not found!\n");
+
             return 1;
         }
 
         if (!$user) {
             $this->stderr("User with ID {$userId} not found!\n");
+
             return 1;
         }
 
@@ -168,11 +172,11 @@ class RbacController extends Controller
     }
 
     /**
-     * List all roles
+     * List all roles.
      */
     public function actionListRoles()
     {
-        $auth = Yii::$app->authManager;
+        $auth = \Yii::$app->authManager;
         $roles = $auth->getRoles();
 
         $this->stdout("\nAvailable roles:\n");
@@ -182,11 +186,11 @@ class RbacController extends Controller
     }
 
     /**
-     * List all permissions
+     * List all permissions.
      */
     public function actionListPermissions()
     {
-        $auth = Yii::$app->authManager;
+        $auth = \Yii::$app->authManager;
         $permissions = $auth->getPermissions();
 
         $this->stdout("\nAvailable permissions:\n");

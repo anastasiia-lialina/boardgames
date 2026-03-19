@@ -13,9 +13,7 @@ class ReviewSearch extends Review
 {
     public $gameTitle;
     public $username;
-    /**
-     * {@inheritdoc}
-     */
+
     public function rules()
     {
         return [
@@ -25,23 +23,17 @@ class ReviewSearch extends Review
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function scenarios()
     {
         return Model::scenarios();
     }
 
     /**
-     * Creates data provider instance with search query applied
+     * Creates data provider instance with search query applied.
      *
-     * @param array $params
-     * @param string|null $formName Form name to be used into `->load()` method.
-     *
-     * @return ActiveDataProvider
+     * @param string|null $formName form name to be used into `->load()` method
      */
-    public function search($params, $formName = null)
+    public function search(array $params, ?string $formName = null): ActiveDataProvider
     {
         $query = Review::find()->joinWith(['game', 'user']);
 
@@ -99,17 +91,14 @@ class ReviewSearch extends Review
     }
 
     /**
-     * Получить одобренные отзывы для конкретной игры
-     *
-     * @param int $gameId
-     * @param int $pageSize
-     * @return ActiveDataProvider
+     * Получить одобренные отзывы для конкретной игры.
      */
     public function getApprovedReviewsForGame(int $gameId, int $pageSize = 2): ActiveDataProvider
     {
         $query = self::find()
             ->where(['game_id' => $gameId, 'is_approved' => true])
-            ->orderBy(['created_at' => SORT_DESC]);
+            ->orderBy(['created_at' => SORT_DESC])
+        ;
 
         return new ActiveDataProvider([
             'query' => $query,

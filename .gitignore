@@ -27,8 +27,6 @@ Thumbs.db
 # Composer
 composer.phar
 
-/tests/
-
 # OS specific
 *.orig
 *.bak

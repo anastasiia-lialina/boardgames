@@ -16,7 +16,7 @@ use yii\helpers\Html;
 <div class="game-session-form">
 
     <?php $form = ActiveForm::begin([
-            'fieldConfig' => ['errorOptions' => ['class' => 'invalid-feedback d-block']],
+        'fieldConfig' => ['errorOptions' => ['class' => 'invalid-feedback d-block']],
     ]); ?>
 
     <?= $form->field($model, 'game_id')->dropDownList(
@@ -25,28 +25,28 @@ use yii\helpers\Html;
     ) ?>
 
     <?= $form->field($model, 'scheduled_at')->widget(DateTimePicker::class, [
-            'options' => [
-                    'placeholder' => Yii::t('app', 'Select date and time...'),
-                    'autocomplete' => 'off',
-                    'value' => $model->scheduled_at ?? '',
-            ],
-            'pluginOptions' => [
-                    'autoclose' => true,
-                    'todayHighlight' => true,
-                    'format' => 'yyyy-mm-dd hh:ii:ss',
-                    //'startDate' => $model->isNewRecord ? date('dd.mm.yyyy hh:ii') : null, // Только будущие даты при создании
-                    'todayBtn' => true,
-                    'minuteStep' => 5,
-            ],
-            'pluginEvents' => [
-                    'changeDate' => 'function(e) { $(this).trigger("blur"); }', // Триггер валидации при изменении
-            ],
+        'options' => [
+            'placeholder' => Yii::t('app', 'Select date and time...'),
+            'autocomplete' => 'off',
+            'value' => $model->scheduled_at ?? '',
+        ],
+        'pluginOptions' => [
+            'autoclose' => true,
+            'todayHighlight' => true,
+            'format' => 'yyyy-mm-dd hh:ii:ss',
+            //'startDate' => $model->isNewRecord ? date('dd.mm.yyyy hh:ii') : null, // Только будущие даты при создании
+            'todayBtn' => true,
+            'minuteStep' => 5,
+        ],
+        'pluginEvents' => [
+            'changeDate' => 'function(e) { $(this).trigger("blur"); }', // Триггер валидации при изменении
+        ],
     ]) ?>
 
     <?= $form->field($model, 'max_participants')->textInput([
-            'type' => 'number',
-            'min' => 2,
-            'max' => 20,
+        'type' => 'number',
+        'min' => 2,
+        'max' => 20,
     ]) ?>
     <?php if (!$model->isNewRecord):?>
         <?= $form->field($model, 'status')->dropDownList($model->getStatusLabels()) ?>

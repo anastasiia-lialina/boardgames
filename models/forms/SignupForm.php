@@ -3,35 +3,31 @@
 namespace app\models\forms;
 
 use app\models\user\User;
-use Yii;
 use yii\base\Model;
 use yii\db\Exception;
 
 /**
- * Signup form
+ * Signup form.
  */
-class SignupForm extends Model
+class SignupForm extends Model implements Form
 {
     public $username;
     public $email;
     public $password;
 
-    /**
-     * @inheritdoc
-     */
     public function rules()
     {
         return [
             ['username', 'trim'],
             ['username', 'required'],
-            ['username', 'unique', 'targetClass' => '\app\models\user\User', 'message' => Yii::t('app', 'This username has already been taken.')],
+            ['username', 'unique', 'targetClass' => '\app\models\user\User', 'message' => \Yii::t('app', 'This username has already been taken.')],
             ['username', 'string', 'min' => 2, 'max' => 50],
 
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'string', 'max' => 100],
-            ['email', 'unique', 'targetClass' => '\app\models\user\User', 'message' => Yii::t('app', 'This email address has already been taken.')],
+            ['email', 'unique', 'targetClass' => '\app\models\user\User', 'message' => \Yii::t('app', 'This email address has already been taken.')],
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
@@ -41,16 +37,17 @@ class SignupForm extends Model
     public function attributeLabels()
     {
         return [
-            'username' => Yii::t('app', 'Username'),
-            'password' => Yii::t('app', 'Password'),
-            'email' => Yii::t('app', 'Email'),
+            'username' => \Yii::t('app', 'Username'),
+            'password' => \Yii::t('app', 'Password'),
+            'email' => \Yii::t('app', 'Email'),
         ];
     }
 
     /**
      * Signs user up.
      *
-     * @return User|null the saved model or null if saving fails
+     * @return null|User the saved model or null if saving fails
+     *
      * @throws Exception
      */
     public function signup()
@@ -71,12 +68,21 @@ class SignupForm extends Model
         }
 
         // Назначаем роль user новому пользователю
-        $auth = Yii::$app->authManager;
+        $auth = \Yii::$app->authManager;
         $userRole = $auth->getRole('user');
         if ($userRole) {
             $auth->assign($userRole, $user->id);
         }
 
         return $user;
+    }
+
+    public function getSafeAttributes(): array
+    {
+        return [
+            'username' => $this->username,
+            'email' => $this->email,
+            'password' => $this->password ?? '',
+        ];
     }
 }

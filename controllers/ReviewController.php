@@ -3,11 +3,8 @@
 namespace app\controllers;
 
 use app\models\forms\ReviewForm;
-use app\models\search\ReviewSearch;
 use app\models\user\Review;
 use app\services\ReviewService;
-use Yii;
-use yii\base\Exception;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -28,9 +25,6 @@ class ReviewController extends Controller
         parent::__construct($id, $module, $config);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function behaviors(): array
     {
         return [
@@ -39,18 +33,13 @@ class ReviewController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'view'],
-                        'roles' => ['?', '@'],
-                    ],
-                    [
-                        'allow' => true,
                         'actions' => ['create'],
                         'roles' => ['@'],
                         'permissions' => ['createReview'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update', 'delete'],
+                        'actions' => ['update', 'delete', 'view'],
                         'permissions' => ['manageReviews'],
                     ],
                 ],
@@ -65,26 +54,11 @@ class ReviewController extends Controller
     }
 
     /**
-     * Lists all Reviews models.
-     *
-     * @return string
-     */
-    public function actionIndex(): string
-    {
-        $searchModel = new ReviewSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
      * Displays a single Reviews model.
+     *
      * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
+     *
+     * @throws \Exception|NotFoundHttpException if the model cannot be found
      */
     public function actionView(int $id): string
     {
@@ -96,23 +70,23 @@ class ReviewController extends Controller
     /**
      * Creates a new Reviews model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|Response
-     * @throws Exception
      */
     public function actionCreate(): Response|string
     {
         $form = new ReviewForm();
-        $form->user_id = Yii::$app->user->id;
+        $form->user_id = \Yii::$app->user->id;
 
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+        if ($form->load(\Yii::$app->request->post()) && $form->validate()) {
             try {
                 $this->reviewService->createReview($form);
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Review created successfully!'));
+                \Yii::$app->session->setFlash('success', \Yii::t('app', 'Review created successfully!'));
+
                 return $this->redirect(['game/view', 'id' => $form->game_id]);
             } catch (\Exception $e) {
-                Yii::$app->session->setFlash('error', $e->getMessage());
+                \Yii::$app->session->setFlash('error', $e->getMessage());
             }
         }
+
         return $this->render('create', [
             'model' => $form,
         ]);
@@ -121,39 +95,29 @@ class ReviewController extends Controller
     /**
      * Updates an existing Reviews model.
      * If update is successful, the browser will be redirected to the 'view' page.
+     *
      * @param int $id ID
-     * @return string|Response
-     * @throws NotFoundHttpException if the model cannot be found
+     *
+     * @throws \Exception|NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id): Response|string
     {
-        $model = $this->findModel($id);
+        if ($this->request->isPost) {
+            try {
+                $model = $this->reviewService->updateReview($id, $this->request->post());
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['view', 'id' => $model->id]);
+            } catch (\Exception $e) {
+                \Yii::$app->session->setFlash('error', $e->getMessage());
+                $model = $this->reviewService->findModel(Review::class, $id);
+                $model->load($this->request->post());
+            }
+        } else {
+            $model = $this->reviewService->findModel(Review::class, $id);
         }
 
         return $this->render('update', [
             'model' => $model,
         ]);
-    }
-
-    /**
-     * Deletes an existing Reviews model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        try {
-            $this->reviewService->deleteReview($id);
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Review deleted successfully!'));
-        } catch (\Exception $e) {
-            Yii::$app->session->setFlash('error', $e->getMessage());
-        }
-
-        return $this->redirect(['index']);
     }
 }

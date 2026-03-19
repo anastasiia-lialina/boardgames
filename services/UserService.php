@@ -2,19 +2,26 @@
 
 namespace app\services;
 
+use app\exception\ServiceException;
+use app\models\forms\Form;
 use app\models\user\User;
-use yii\base\Exception;
 
 class UserService extends BaseService
 {
+    /**
+     * @throws \Exception
+     */
     public function findUser(int $id): User
     {
         return $this->findModel(User::class, $id);
     }
 
-    public function findUserByUsername(string $username): ?User
+    /**
+     * Finds active user by username.
+     */
+    public function findByUsername(string $username): ?User
     {
-        return User::findOne(['username' => $username]);
+        return User::findOne(['username' => $username, 'status' => User::STATUS_ACTIVE]);
     }
 
     public function findUserByEmail(string $email): ?User
@@ -22,31 +29,38 @@ class UserService extends BaseService
         return User::findOne(['email' => $email]);
     }
 
-    public function createUser(array $data): User
+    /**
+     * @throws ServiceException
+     * @throws \yii\db\Exception
+     * @throws \Exception
+     */
+    public function createUser(Form $form, string $role = User::ROLE_USER): User
     {
         $user = new User();
-        $user->load($data);
-        $user->setPassword($data['User']['password'] ?? '');
+        $this->load($user, $form);
+        $user->setPassword($form->password ?? '');
         $user->generateAuthKey();
 
         if (!$user->save()) {
-            throw new Exception($this->formatValidationErrors($user));
+            throw new ServiceException($user);
         }
+
+        $this->assignRole($user->id, $role);
 
         return $user;
     }
 
-    public function updateUser(int $id, array $data): User
+    public function updateUser(int $id, Form $form): User
     {
         $user = $this->findUser($id);
-        $user->load($data);
 
-        if (!empty($data['User']['password'])) {
-            $user->setPassword($data['User']['password']);
+        $this->load($user, $form);
+        if (!empty($form->getSafeAttributes()['password'])) {
+            $user->setPassword($form->getSafeAttributes()['password']);
         }
 
         if (!$user->save()) {
-            throw new Exception($this->formatValidationErrors($user));
+            throw new ServiceException($user);
         }
 
         return $user;
@@ -56,6 +70,7 @@ class UserService extends BaseService
     {
         $user = $this->findUser($id);
         $user->status = User::STATUS_DELETED;
+
         return $user->save(false, ['status']);
     }
 
@@ -63,17 +78,30 @@ class UserService extends BaseService
     {
         $user = $this->findUser($id);
         $user->status = User::STATUS_ACTIVE;
+
         return $user->save(false, ['status']);
     }
 
-    public function getUserStats(int $userId): array
+    /**
+     * Назначение роли пользователю.
+     */
+    public function assignRole(int $userId, string $roleName): void
     {
-        $user = $this->findUser($userId);
+        $auth = \Yii::$app->authManager;
+        $role = $auth->getRole($roleName);
 
-        return [
-            'reviews_count' => $user->getReviews()->count(),
-            'sessions_organized' => $user->getGameSessions()->count(),
-            'subscriptions' => $user->getGameSubscriptions()->count(),
-        ];
+        if (!$role) {
+            throw new \Exception("Роль '{$roleName}' не найдена в системе.");
+        }
+
+        $auth->revokeAll($userId);
+        $auth->assign($role, $userId);
+    }
+
+    public function login(User $user, bool $rememberMe = false): bool
+    {
+        $duration = $rememberMe ? 3600 * 24 * 30 : 0;
+
+        return \Yii::$app->user->login($user, $duration);
     }
 }

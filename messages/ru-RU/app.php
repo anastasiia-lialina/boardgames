@@ -112,4 +112,6 @@ return [
     'Subscription status changed.' => 'Статус подписки изменён.',
     'Are you sure you want to delete this subscription?' => 'Вы действительно хотите удалить подписку?',
     'Subscription to game has been removed.' => 'Подписка на игру была удалена.',
+    'A new review has been added.' => 'Добавлен новый отзыв.',
+    'Update Session' => 'Обновление сессии',
 ];

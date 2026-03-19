@@ -4,18 +4,23 @@ namespace app\behaviors;
 
 use app\models\game\GameSessionLog;
 use yii\base\Behavior;
-use yii\db\ActiveRecord;
+use yii\base\Event;
+use yii\db\BaseActiveRecord;
+use yii\db\Exception;
 
 class StatusLogBehavior extends Behavior
 {
-    public function events()
+    public function events(): array
     {
         return [
-            ActiveRecord::EVENT_AFTER_UPDATE => 'logStatusChange',
+            BaseActiveRecord::EVENT_AFTER_UPDATE => 'logStatusChange',
         ];
     }
 
-    public function logStatusChange($event)
+    /**
+     * @throws Exception
+     */
+    public function logStatusChange(Event $event): void
     {
         if (isset($event->changedAttributes['status'])) {
             $log = new GameSessionLog();

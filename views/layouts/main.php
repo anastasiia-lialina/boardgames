@@ -28,10 +28,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <?php $this->head() ?>
 </head>
 <body class="d-flex flex-column h-100">
-<?php $this->beginBody() ?>
-
-<header id="header">
-<?php
+    <?php $this->beginBody() ?>
+    <header id="header">
+    <?php
 
     $isGuest = Yii::$app->user->isGuest;
 $isUser = Yii::$app->user->can('user');
@@ -48,14 +47,14 @@ $menuItems = [
         'url' => ['/game-session/index'],
     ],
     [
-            'label' => Yii::t('app', 'Review Moderation'),
-            'url' => ['/admin/index'],
-            'visible' => $canManageReviews,
+        'label' => Yii::t('app', 'Review Moderation'),
+        'url' => ['/admin/index'],
+        'visible' => $canManageReviews,
     ],
     [
-            'label' => Yii::t('app', 'Subscriptions'),
-            'url' => ['/game-subscription/index'],
-            'visible' => $isUser,
+        'label' => Yii::t('app', 'Subscriptions'),
+        'url' => ['/game-subscription/index'],
+        'visible' => $isUser,
     ],
     [
         'label' => NotificationsBS5::widget(['id' => 'notifications']),
@@ -71,14 +70,14 @@ $menuItems = [
         'visible' => $isUser,
     ],
     [
-            'label' => Yii::t('app', 'Signup'),
-            'url' => ['/site/signup'],
-            'visible' => $isGuest,
+        'label' => Yii::t('app', 'Signup'),
+        'url' => ['/site/signup'],
+        'visible' => $isGuest,
     ],
     [
-            'label' => Yii::t('app', 'Login'),
-            'url' => ['/site/login'],
-            'visible' => $isGuest,
+        'label' => Yii::t('app', 'Login'),
+        'url' => ['/site/login'],
+        'visible' => $isGuest,
     ],
     [
         'label' => Yii::t('app', 'Logout'),
@@ -94,34 +93,33 @@ NavBar::begin([
 ]);
 echo Nav::widget([
     'options' => ['class' => 'navbar-nav'],
-        'items' => $menuItems,
+    'items' => $menuItems,
 ]);
 
 NavBar::end();
 ?>
 
-</header>
+        </header>
 
-<main id="main" class="flex-shrink-0" role="main">
-    <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
-    </div>
-</main>
+        <main id="main" class="flex-shrink-0" role="main">
+            <div class="container">
+                <?php if (!empty($this->params['breadcrumbs'])): ?>
+                    <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
+                <?php endif ?>
+                <?= Alert::widget() ?>
+                <?= $content ?>
+            </div>
+        </main>
 
-<footer id="footer" class="mt-auto py-3 bg-light">
-    <div class="container">
-        <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; My Company <?= date('Y') ?></div>
-            <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
-        </div>
-    </div>
-</footer>
-
-<?php $this->endBody() ?>
+        <footer id="footer" class="mt-auto py-3 bg-light">
+            <div class="container">
+                <div class="row text-muted">
+                    <div class="col-md-6 text-center text-md-start">&copy; My Company <?= date('Y') ?></div>
+                    <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+                </div>
+            </div>
+        </footer>
+    <?php $this->endBody() ?>
 </body>
-</html>
+</html>g
 <?php $this->endPage() ?>

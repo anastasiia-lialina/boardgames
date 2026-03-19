@@ -2,7 +2,6 @@
 
 namespace app\models\game;
 
-use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -10,23 +9,17 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property int $session_id
- * @property string|null $old_status
- * @property string|null $new_status
+ * @property null|string $old_status
+ * @property null|string $new_status
  * @property string $changed_at
  */
 class GameSessionLog extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'game_session_log';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -39,18 +32,14 @@ class GameSessionLog extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'session_id' => Yii::t('app', 'Session ID'),
-            'old_status' => Yii::t('app', 'Old Status'),
-            'new_status' => Yii::t('app', 'New Status'),
-            'changed_at' => Yii::t('app', 'Changed At'),
+            'id' => \Yii::t('app', 'ID'),
+            'session_id' => \Yii::t('app', 'Session ID'),
+            'old_status' => \Yii::t('app', 'Old Status'),
+            'new_status' => \Yii::t('app', 'New Status'),
+            'changed_at' => \Yii::t('app', 'Changed At'),
         ];
     }
-
 }

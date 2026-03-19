@@ -2,10 +2,10 @@
 
 namespace app\controllers;
 
+use app\models\forms\GameSubscriptionForm;
 use app\models\game\GameSubscription;
 use app\models\search\GameSubscriptionSearch;
 use app\services\GameSubscriptionService;
-use Yii;
 use yii\base\Exception;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -15,12 +15,6 @@ use yii\web\Response;
 
 class GameSubscriptionController extends Controller
 {
-    /**
-     * @param $id
-     * @param $module
-     * @param GameSubscriptionService $subscriptionService
-     * @param array $config
-     */
     public function __construct(
         $id,
         $module,
@@ -46,10 +40,12 @@ class GameSubscriptionController extends Controller
                         'actions' => ['toggle', 'delete'],
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-                            $id = Yii::$app->request->get('id');
+                            $id = \Yii::$app->request->get('id');
+
                             return GameSubscription::find()
-                                ->where(['id' => $id, 'user_id' => Yii::$app->user->id])
-                                ->exists();
+                                ->where(['id' => $id, 'user_id' => \Yii::$app->user->id])
+                                ->exists()
+                            ;
                         },
                     ],
                 ],
@@ -67,14 +63,14 @@ class GameSubscriptionController extends Controller
     }
 
     /**
-     * Список подписок пользователя
+     * Список подписок пользователя.
      */
     public function actionIndex(): string
     {
-        $searchModel = new \app\models\search\GameSubscriptionSearch();
+        $searchModel = new GameSubscriptionSearch();
         $dataProvider = $this->subscriptionService->getSubscriptionProvider(
-            Yii::$app->request->queryParams,
-            Yii::$app->user->id
+            \Yii::$app->request->queryParams,
+            \Yii::$app->user->id
         );
 
         return $this->render('index', [
@@ -84,71 +80,82 @@ class GameSubscriptionController extends Controller
     }
 
     /**
-     * Подписаться на игру
-     * @throws NotFoundHttpException
+     * Подписаться на игру.
+     *
      * @throws \Exception
      */
     public function actionSubscribe(): Response
     {
-        $gameId = $this->request->post('gameId');
+        $form = new GameSubscriptionForm();
+        $form->user_id = \Yii::$app->user->id;
+        $form->game_id = $this->request->post('gameId');
 
-        try {
-            $this->subscriptionService->subscribe(Yii::$app->user->id, $gameId);
-            Yii::$app->session->setFlash('success', Yii::t('app', 'You have subscribed to the game.'));
-        } catch (\Exception $e) {
-            Yii::$app->session->setFlash('error', $e->getMessage());
+        if ($form->validate()) {
+            try {
+                $this->subscriptionService->subscribe($form->user_id, $form->game_id);
+                \Yii::$app->session->setFlash('success', \Yii::t('app', 'You have subscribed to the game.'));
+            } catch (\Exception $e) {
+                \Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+        } else {
+            \Yii::$app->session->setFlash('error', \Yii::t('app', 'Invalid subscription data.'));
         }
 
-        return $this->redirect(['game/view', 'id' => $gameId]);
+        return $this->redirect(['game/view', 'id' => $form->game_id]);
     }
 
     /**
-     * Отписаться от игры
-     * @throws NotFoundHttpException
-     * @throws \yii\db\Exception
-     * @throws \Exception
+     * Отписаться от игры.
+     *
+     * @return Response
      */
     public function actionUnsubscribe(): Response
     {
-        $gameId = $this->request->post('gameId');
+        $form = new GameSubscriptionForm();
+        $form->user_id = \Yii::$app->user->id;
+        $form->game_id = $this->request->post('gameId');
 
-        try {
-            $this->subscriptionService->unsubscribe(Yii::$app->user->id, $gameId);
-            Yii::$app->session->setFlash('success', Yii::t('app', 'You have unsubscribed from the game.'));
-        } catch (\Exception $e) {
-            Yii::$app->session->setFlash('error', $e->getMessage());
+        if ($form->validate()) {
+            try {
+                $this->subscriptionService->unsubscribe($form->user_id, $form->game_id);
+                \Yii::$app->session->setFlash('success', \Yii::t('app', 'You have unsubscribed from the game.'));
+            } catch (\Exception $e) {
+                \Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+        } else {
+            \Yii::$app->session->setFlash('error', \Yii::t('app', 'Invalid subscription data.'));
         }
 
-        return $this->redirect(['game/view', 'id' => $gameId]);
+        return $this->redirect(['game/view', 'id' => $form->game_id]);
     }
 
     /**
-     * Переключить статус подписки (активна/неактивна)
-     * @param int $id
-     * @return Response
+     * Переключить статус подписки (активна/неактивна).
      */
     public function actionToggle(int $id): Response
     {
         try {
             $this->subscriptionService->toggleSubscription($id);
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Subscription status changed.'));
-        } catch (Exception) {
-            Yii::$app->session->setFlash('error', Yii::t('app', 'Error changing subscription status.'));
+            \Yii::$app->session->setFlash('success', \Yii::t('app', 'Subscription status changed.'));
+        } catch (Exception $e) {
+            \Yii::$app->session->setFlash('error', \Yii::t('app', 'Error changing subscription status.'));
         }
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Удалить подписку
+     * Удалить подписку.
+     *
+     * @param mixed $id
      */
     public function actionDelete($id): Response
     {
         try {
             $this->subscriptionService->deleteSubscription($id);
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Subscription to game has been removed.'));
+            \Yii::$app->session->setFlash('success', \Yii::t('app', 'Subscription to game has been removed.'));
         } catch (\Exception $e) {
-            Yii::$app->session->setFlash('error', $e->getMessage());
+            \Yii::$app->session->setFlash('error', $e->getMessage());
         }
 
         return $this->redirect(['index']);

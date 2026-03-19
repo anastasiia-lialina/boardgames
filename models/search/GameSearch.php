@@ -11,9 +11,6 @@ use yii\data\ActiveDataProvider;
  */
 class GameSearch extends Game
 {
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -23,9 +20,6 @@ class GameSearch extends Game
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class
@@ -33,10 +27,10 @@ class GameSearch extends Game
     }
 
     /**
-     * Creates data provider instance with search query applied
+     * Creates data provider instance with search query applied.
      *
      * @param array $params
-     * @param string|null $formName Form name to be used into `->load()` method.
+     * @param null|string $formName form name to be used into `->load()` method
      *
      * @return ActiveDataProvider
      */
@@ -70,7 +64,8 @@ class GameSearch extends Game
         ]);
 
         $query->andFilterWhere(['ilike', 'title', $this->title])
-            ->andFilterWhere(['ilike', 'description', $this->description]);
+            ->andFilterWhere(['ilike', 'description', $this->description])
+        ;
 
         return $dataProvider;
     }

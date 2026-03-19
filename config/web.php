@@ -1,12 +1,16 @@
 <?php
 
+use app\bootstrap\EventBootstrap;
+use yii\queue\amqp_interop\Queue;
+use yii\queue\LogBehavior;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'queue'],
+    'bootstrap' => ['log', 'queue', EventBootstrap::class],
     'defaultRoute' => 'game/index',
     'name' => 'BoardGames',
     'language' => 'ru-RU',
@@ -27,9 +31,6 @@ $config = [
     ],
     'timeZone' => 'Europe/Moscow',
     'components' => [
-        'gameSessionService' => [
-            'class' => 'app\services\GameSessionService',
-        ],
         'request' => [
             'cookieValidationKey' => getenv('APP_KEY') ?: 'your-secret-key-here',
             'baseUrl' => '',
@@ -115,7 +116,7 @@ $config = [
             'cache' => 'cache',
         ],
         'queue' => [
-            'class' => \yii\queue\amqp_interop\Queue::class,
+            'class' => Queue::class,
             'host' => getenv('RABBITMQ_HOST'),
             'port' => getenv('RABBITMQ_PORT'),
             'user' => getenv('RABBITMQ_USER'),
@@ -124,13 +125,12 @@ $config = [
             'queueName' => 'notifications',
             'exchangeName' => 'notifications_exchange',
             'routingKey' => 'notifications',
-            'driver' => \yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
-            'as log' => \yii\queue\LogBehavior::class,
+            'driver' => Queue::ENQUEUE_AMQP_LIB,
+            'as log' => LogBehavior::class,
         ],
     ],
     'params' => $params,
 ];
-
 if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [

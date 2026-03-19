@@ -3,28 +3,26 @@
 namespace app\models\game;
 
 use app\models\user\User;
-use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
- * Модель подписки пользователя на игру
+ * Модель подписки пользователя на игру.
  *
  * @property int $id
  * @property int $user_id
  * @property int $game_id
  * @property string $created_at
  * @property bool $is_active
- *
  * @property User $user
  * @property Game $game
  */
 class GameSubscription extends ActiveRecord
 {
-    public const STATUS_ACTIVE = 1;
-    public const STATUS_INACTIVE = 0;
+    public const STATUS_ACTIVE = true;
+    public const STATUS_INACTIVE = false;
 
     public static function tableName()
     {
@@ -58,17 +56,17 @@ class GameSubscription extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'User'),
-            'game_id' => Yii::t('app', 'Game'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'is_active' => Yii::t('app', 'Status'),
-            'game.title' => Yii::t('app', 'Game'),
+            'id' => \Yii::t('app', 'ID'),
+            'user_id' => \Yii::t('app', 'User'),
+            'game_id' => \Yii::t('app', 'Game'),
+            'created_at' => \Yii::t('app', 'Created At'),
+            'is_active' => \Yii::t('app', 'Status'),
+            'game.title' => \Yii::t('app', 'Game'),
         ];
     }
 
     /**
-     * Получить пользователя
+     * Получить пользователя.
      */
     public function getUser()
     {
@@ -76,7 +74,7 @@ class GameSubscription extends ActiveRecord
     }
 
     /**
-     * Получить игру
+     * Получить игру.
      */
     public function getGame(): ActiveQuery
     {

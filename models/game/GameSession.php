@@ -4,7 +4,6 @@ namespace app\models\game;
 
 use app\behaviors\StatusLogBehavior;
 use app\models\user\User;
-use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -19,9 +18,8 @@ use yii\helpers\ArrayHelper;
  * @property int $max_participants Максимальное количество участников
  * @property string $status Статус сессии
  * @property string $created_at Дата добавления
- *
  * @property Game $game
- * @property string|null $statusLabel
+ * @property null|string $statusLabel
  */
 class GameSession extends ActiveRecord
 {
@@ -33,17 +31,14 @@ class GameSession extends ActiveRecord
     public const MIN_PARTICIPANTS = 2;
     public const MAX_PARTICIPANTS = 20;
 
-    /**
-     * {@inheritdoc}
-     */
+    public const EVENT_SESSION_CREATED = 'sessionCreated';
+    public const EVENT_STATUS_CHANGED = 'sessionStatusChanged';
+
     public static function tableName(): string
     {
         return '{{%game_sessions}}';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -53,21 +48,18 @@ class GameSession extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels(): array
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'game_id' => Yii::t('app', 'Game'),
-            'organizer_id' => Yii::t('app', 'Organizer'),
-            'scheduled_at' => Yii::t('app', 'Scheduled At'),
-            'max_participants' => Yii::t('app', 'Max Participants'),
-            'status' => Yii::t('app', 'Status'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'organizerUsername' => Yii::t('app', 'Organizer'),
-            'gameTitle' => Yii::t('app', 'Game'),
+            'id' => \Yii::t('app', 'ID'),
+            'game_id' => \Yii::t('app', 'Game'),
+            'organizer_id' => \Yii::t('app', 'Organizer'),
+            'scheduled_at' => \Yii::t('app', 'Scheduled At'),
+            'max_participants' => \Yii::t('app', 'Max Participants'),
+            'status' => \Yii::t('app', 'Status'),
+            'created_at' => \Yii::t('app', 'Created At'),
+            'organizerUsername' => \Yii::t('app', 'Organizer'),
+            'gameTitle' => \Yii::t('app', 'Game'),
         ];
     }
 
@@ -81,7 +73,7 @@ class GameSession extends ActiveRecord
     /**
      * Returns an array of all allowed statuses for a GameSession.
      *
-     * @return string[] Array of allowed statuses.
+     * @return string[] array of allowed statuses
      */
     public static function allowedStatuses(): array
     {
@@ -95,8 +87,6 @@ class GameSession extends ActiveRecord
 
     /**
      * Gets query for [[Game]].
-     *
-     * @return ActiveQuery
      */
     public function getGame(): ActiveQuery
     {
@@ -113,16 +103,16 @@ class GameSession extends ActiveRecord
      */
     public function getStatusLabel()
     {
-        return ArrayHelper::getValue($this->getStatusLabels(), $this->status, Yii::t('app', 'Planned'));
+        return ArrayHelper::getValue($this->getStatusLabels(), $this->status, \Yii::t('app', 'Planned'));
     }
 
     public function getStatusLabels(): array
     {
         return [
-            self::STATUS_PLANNED => Yii::t('app', 'Planned'),
-            self::STATUS_ACTIVE => Yii::t('app', 'Active'),
-            self::STATUS_COMPLETED => Yii::t('app', 'Completed'),
-            self::STATUS_CANCELLED => Yii::t('app', 'Cancelled'),
+            self::STATUS_PLANNED => \Yii::t('app', 'Planned'),
+            self::STATUS_ACTIVE => \Yii::t('app', 'Active'),
+            self::STATUS_COMPLETED => \Yii::t('app', 'Completed'),
+            self::STATUS_CANCELLED => \Yii::t('app', 'Cancelled'),
         ];
     }
 }

@@ -2,19 +2,23 @@
 
 namespace app\services;
 
+use app\exception\ServiceException;
+use app\models\forms\Form;
 use app\models\game\GameSubscription;
 use app\models\search\GameSubscriptionSearch;
 use yii\base\Exception;
 use yii\data\ActiveDataProvider;
+use yii\db\StaleObjectException;
 
 /**
- * Сервис для управления подписками на игры
+ * Сервис для управления подписками на игры.
  */
 class GameSubscriptionService extends BaseService
 {
     public function getSubscriptionProvider(array $params, ?int $userId = null): ActiveDataProvider
     {
         $searchModel = new GameSubscriptionSearch();
+
         return $searchModel->search($params, $userId);
     }
 
@@ -27,21 +31,26 @@ class GameSubscriptionService extends BaseService
     {
         return $this->findModel(GameSubscription::class, $id);
     }
+
     /**
-     * Подписка пользователя на игру
+     * Подписка пользователя на игру.
      *
      * @param int $userId ID пользователя
      * @param int $gameId ID игры
+     *
      * @return bool Успешность операции
-     * @throws \yii\base\Exception При ошибке
-     * @throws Exception
      */
     public function isSubscribed(int $userId, int $gameId): bool
     {
         $subscription = $this->findSubscription($userId, $gameId);
-        return $subscription && $subscription->is_active === GameSubscription::STATUS_ACTIVE;
+
+        return $subscription && GameSubscription::STATUS_ACTIVE === $subscription->is_active;
     }
 
+    /**
+     * @throws ServiceException
+     * @throws \yii\db\Exception
+     */
     public function subscribe(int $userId, int $gameId): bool
     {
         $existing = $this->findSubscription($userId, $gameId);
@@ -52,6 +61,7 @@ class GameSubscriptionService extends BaseService
             }
 
             $existing->is_active = GameSubscription::STATUS_ACTIVE;
+
             return $existing->save(false, ['is_active']);
         }
 
@@ -61,12 +71,15 @@ class GameSubscriptionService extends BaseService
         $subscription->is_active = GameSubscription::STATUS_ACTIVE;
 
         if (!$subscription->save()) {
-            throw new Exception($this->formatValidationErrors($subscription));
+            throw new ServiceException($subscription);
         }
 
         return true;
     }
 
+    /**
+     * @throws \yii\db\Exception
+     */
     public function unsubscribe(int $userId, int $gameId): bool
     {
         $subscription = $this->findSubscription($userId, $gameId);
@@ -76,13 +89,44 @@ class GameSubscriptionService extends BaseService
         }
 
         $subscription->is_active = GameSubscription::STATUS_INACTIVE;
+
         return $subscription->save(false, ['is_active']);
     }
 
+    /**
+     * Переключение статуса подписки.
+     *
+     * @return bool Успешность операции
+     *
+     * @throws \yii\db\Exception
+     * @throws Exception
+     */
+    public function toggleSubscription(int $id): bool
+    {
+        $subscription = GameSubscription::findOne($id);
+
+        if ($subscription) {
+            $subscription->is_active = !$subscription->is_active;
+
+            if (!$subscription->save(false, ['is_active'])) {
+                throw new ServiceException($subscription);
+            }
+
+            return true;
+        }
+
+        throw new Exception('The requested subscription does not exist.');
+    }
+
+    /**
+     * @throws \Throwable
+     * @throws StaleObjectException
+     */
     public function deleteSubscription(int $id): bool
     {
         $subscription = $this->findSubscriptionById($id);
-        return $subscription->delete() !== false;
+
+        return false !== $subscription->delete();
     }
 
     public function getUserSubscriptions(int $userId): array
@@ -90,7 +134,8 @@ class GameSubscriptionService extends BaseService
         return GameSubscription::find()
             ->with(['game'])
             ->where(['user_id' => $userId, 'is_active' => GameSubscription::STATUS_ACTIVE])
-            ->all();
+            ->all()
+        ;
     }
 
     public function getGameSubscribers(int $gameId): array
@@ -98,18 +143,21 @@ class GameSubscriptionService extends BaseService
         return GameSubscription::find()
             ->with(['user'])
             ->where(['game_id' => $gameId, 'is_active' => GameSubscription::STATUS_ACTIVE])
-            ->all();
+            ->all()
+        ;
     }
 
     public function getSubscriptionStats(int $gameId): array
     {
         $total = GameSubscription::find()
             ->where(['game_id' => $gameId])
-            ->count();
+            ->count()
+        ;
 
         $active = GameSubscription::find()
             ->where(['game_id' => $gameId, 'is_active' => GameSubscription::STATUS_ACTIVE])
-            ->count();
+            ->count()
+        ;
 
         return [
             'total_subscriptions' => $total,
