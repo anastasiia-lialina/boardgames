@@ -17,7 +17,7 @@ return [
     'components' => [
         'db' => $db,
         'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
+            'class' => yii\symfonymailer\Mailer::class,
             'viewPath' => '@app/mail',
             // send all mails to a file by default.
             'useFileTransport' => true,

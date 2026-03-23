@@ -23,7 +23,6 @@ class m260209_112321_create_game_sessions_table extends Migration
         ]);
         $this->addCommentOnTable('{{%game_sessions}}', 'Игровые встречи');
 
-
         $this->addForeignKey(
             'fk-sessions-game_id',
             '{{%game_sessions}}',

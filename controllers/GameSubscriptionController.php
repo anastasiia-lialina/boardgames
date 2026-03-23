@@ -10,7 +10,6 @@ use yii\base\Exception;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class GameSubscriptionController extends Controller
@@ -106,8 +105,6 @@ class GameSubscriptionController extends Controller
 
     /**
      * Отписаться от игры.
-     *
-     * @return Response
      */
     public function actionUnsubscribe(): Response
     {

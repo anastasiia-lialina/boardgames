@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 
 # Список всех "ложных" целей (не файлов)
-.PHONY: help up down restart sh composer update migrate migrate-create migrate-down-all migrate-down perms logs logs-php db
+.PHONY: help up down restart sh composer update migrate migrate-create migrate-down-all migrate-down perms logs logs-php db check-style fix
 
 help: ## Помощь
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -62,3 +62,9 @@ game-session-update: ##  Обновить статусы игровых сесс
 
 game-session-check: ##  Проверить статусы игровых сессий
 	docker compose exec php php yii session/check-stale
+
+check-style: ##  Проверить стиль кода
+	docker compose exec php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff
+
+fix: ##  Исправить стиль кода
+	docker compose exec php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php
