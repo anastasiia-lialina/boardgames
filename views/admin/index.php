@@ -1,6 +1,7 @@
 <?php
 
 use app\components\RatingHelper;
+use app\models\user\Review;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
@@ -60,11 +61,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'class' => 'yii\grid\ActionColumn',
+                'contentOptions' => ['style' => 'display: flex; gap: 5px; flex-wrap: wrap;'],
                 'template' => '{approve} {reject} {view}',
                 'buttons' => [
                     'approve' => function ($url, $model) {
+                        if ($model->is_approved == Review::STATUS_APPROVED) {
+                            return '';
+                        }
                         return Html::a(Yii::t('app', 'Approve'), ['admin/approve', 'id' => $model->id], [
-                            'class' => 'btn btn-success btn-sm',
+                            'class' => 'btn btn-success btn-sm me-1',
                             'data' => [
                                 'confirm' => Yii::t('app', 'Approve this review?'),
                                 'method' => 'post',
@@ -73,7 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'reject' => function ($url, $model) {
                         return Html::a(Yii::t('app', 'Reject'), ['admin/reject', 'id' => $model->id], [
-                            'class' => 'btn btn-danger btn-sm',
+                            'class' => 'btn btn-danger btn-sm me-1',
                             'data' => [
                                 'confirm' => Yii::t('app', 'Reject this review?'),
                                 'method' => 'post',
@@ -82,7 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'view' => function ($url, $model) {
                         return Html::a(Yii::t('app', 'View'), ['review/view', 'id' => $model->id], [
-                            'class' => 'btn btn-info btn-sm',
+                            'class' => 'btn btn-info btn-sm me-1',
                             'target' => '_blank',
                         ]);
                     },

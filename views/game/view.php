@@ -136,6 +136,9 @@ $reviewCount = $reviewService->getReviewsCount($model->id);
         <div class="review-form mt-4 bg-light p-3 rounded">
             <h2><?= Yii::t('app', 'Leave a Review') ?></h2>
             <?php $form = ActiveForm::begin([
+                'enableAjaxValidation' => true,
+                'enableClientValidation' => true,
+                'method' => 'post',
                 'fieldConfig' => ['errorOptions' => ['class' => 'invalid-feedback d-block']],
             ]); ?>
 

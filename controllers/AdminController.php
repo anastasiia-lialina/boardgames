@@ -46,7 +46,7 @@ class AdminController extends Controller
         $searchModel = new ReviewSearch();
         $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
 
-        $dataProvider->query->andWhere(['is_approved' => false]);
+        $dataProvider->query->orderBy('is_approved');
 
         return $this->render('index', [
             'searchModel' => $searchModel,

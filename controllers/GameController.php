@@ -10,6 +10,7 @@ use app\models\search\GameSessionSearch;
 use app\models\search\ReviewSearch;
 use app\services\GameService;
 use app\services\ReviewService;
+use yii\bootstrap5\ActiveForm;
 use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -74,43 +75,35 @@ class GameController extends Controller
     }
 
     /**
-     * Отображение игры и отправка отзыва.
+     * Отображение игры
      *
      * @param int $id ID
+     * @return Response|array|string
+     * @throws \Throwable
      */
-    public function actionView(int $id): string
+    public function actionView(int $id): Response|array|string
     {
         $model = $this->gameService->getGameWithSessions($id);
+        $reviewForm = new ReviewForm(['game_id' => $id, 'user_id' => \Yii::$app->user->id]);
+        $loaded = $reviewForm->load(\Yii::$app->request->post());
 
-        $reviewSearch = new ReviewSearch();
-        $reviewsDataProvider = $reviewSearch->getApprovedReviewsForGame($id);
+        if (\Yii::$app->request->isAjax && $loaded) {
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($reviewForm);
+        }
 
-        $sessionSearch = new GameSessionSearch();
-        $sessionsDataProvider = $sessionSearch->getUpcomingSessionsForGame($id);
-
-        $reviewForm = new ReviewForm();
-        $reviewForm->game_id = $id;
-        $reviewForm->user_id = \Yii::$app->user->id;
-
-        if ($reviewForm->load(\Yii::$app->request->post()) && $reviewForm->validate()) {
-            try {
-                $review = $this->reviewService->createReview($reviewForm);
-
-                if ($review) {
-                    \Yii::$app->session->setFlash('success', \Yii::t('app', 'Review sent for moderation!'));
-                    $this->refresh();
-                }
-            } catch (\Throwable $e) {
-                var_dump($e->getMessage());
-                \Yii::$app->session->setFlash('error', \Yii::t('app', 'Review do not exist'));
+        if ($loaded && $reviewForm->validate()) {
+            if ($this->reviewService->createReview($reviewForm)) {
+                \Yii::$app->session->setFlash('success', \Yii::t('app', 'Review sent for moderation!'));
+                return $this->refresh();
             }
         }
 
         return $this->render('view', [
             'model' => $model,
-            'reviewsDataProvider' => $reviewsDataProvider,
-            'sessionsDataProvider' => $sessionsDataProvider,
             'reviewForm' => $reviewForm,
+            'reviewsDataProvider' => (new ReviewSearch())->getApprovedReviewsForGame($id),
+            'sessionsDataProvider' => (new GameSessionSearch())->getUpcomingSessionsForGame($id),
         ]);
     }
 
@@ -126,7 +119,7 @@ class GameController extends Controller
 
         if ($form->load($this->request->post()) && $form->validate()) {
             try {
-                $model = $this->gameService->createGame($form->getSafeAttributes());
+                $model = $this->gameService->createGame($form);
 
                 return $this->redirect(['view', 'id' => $model->id]);
             } catch (Exception $e) {
