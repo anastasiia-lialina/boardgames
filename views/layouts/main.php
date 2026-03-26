@@ -36,6 +36,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 $isUser = Yii::$app->user->can('user');
 $canCreateSession = Yii::$app->user->can('createSession');
 $canManageReviews = Yii::$app->user->can('manageReviews');
+$canViewReport = Yii::$app->user->can('admin') || Yii::$app->user->can('moderator');
 
 $menuItems = [
     [
@@ -68,6 +69,11 @@ $menuItems = [
             'class' => 'nav-link d-flex align-items-center',
         ],
         'visible' => $isUser,
+    ],
+    [
+        'label' => Yii::t('app', 'Report for games'),
+        'url' => ['/report/index'],
+        'visible' => $canViewReport,
     ],
     [
         'label' => Yii::t('app', 'Signup'),

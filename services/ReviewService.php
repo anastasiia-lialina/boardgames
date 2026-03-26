@@ -13,29 +13,39 @@ use yii\base\Exception;
  */
 class ReviewService extends BaseService
 {
+    private const RATING_CACHE_KEY_PATTERN = 'game:%d:rating';
+
     /**
      * Создание нового отзыва.
      *
-     * @throws Exception При ошибках валидации
-     * @throws \Exception
+     * @param ReviewForm $form
+     * @return bool
+     * @throws \Throwable
      */
     public function createReview(ReviewForm $form): bool
     {
-        $review = new Review();
-        $review->user_id = $form->user_id;
-        $review->game_id = $form->game_id;
-        $review->rating = $form->rating;
-        $review->comment = $form->comment;
+        $db = Review::getDb();
 
-        if ($review->save()) {
-            Event::trigger(Review::class, Review::EVENT_MODERATION_NEEDED, new Event([
-                'sender' => $review,
-            ]));
+        return $db->transaction(function ($db) use ($form) {
+            $review = new Review();
+            $review->user_id = $form->user_id;
+            $review->game_id = $form->game_id;
+            $review->rating = $form->rating;
+            $review->comment = $form->comment;
 
-            return true;
-        }
+            if ($review->save()) {
+                Event::trigger(Review::class, Review::EVENT_MODERATION_NEEDED, new Event([
+                    'sender' => $review,
+                ]));
+                $this->refreshStats();
 
-        return false;
+                $this->deleteRatingCache($form->game_id);
+
+                return true;
+            }
+
+            return false;
+        });
     }
 
     /**
@@ -51,34 +61,44 @@ class ReviewService extends BaseService
             throw new ServiceException($review);
         }
 
+        $this->refreshStats();
+
         return $review;
     }
 
     /**
      * Одобрение отзыва.
      *
-     * @throws Exception
-     * @throws \Exception
+     * @param int $reviewId
+     * @return bool
+     * @throws \Throwable
      */
     public function approveReview(int $reviewId): bool
     {
-        $review = Review::findOne($reviewId);
+        $db = Review::getDb();
 
-        if (!$review) {
-            throw new \Exception(\Yii::t('app', 'Review not found.'));
-        }
+        return $db->transaction(function ($db) use ($reviewId) {
+            $review = Review::findOne($reviewId);
 
-        $review->is_approved = true;
+            if (!$review) {
+                throw new \Exception(\Yii::t('app', 'Review not found.'));
+            }
 
-        if (!$review->save(false, ['is_approved'])) {
-            throw new \Exception(\Yii::t('app', 'Failed to approve review.'));
-        }
+            $review->is_approved = true;
 
-        Event::trigger(Review::class, Review::EVENT_APPROVED, new Event([
-            'sender' => $review,
-        ]));
+            if (!$review->save(false, ['is_approved'])) {
+                throw new \Exception(\Yii::t('app', 'Failed to approve review.'));
+            }
 
-        return true;
+            Event::trigger(Review::class, Review::EVENT_APPROVED, new Event([
+                'sender' => $review,
+            ]));
+            $this->refreshStats();
+
+            $this->deleteRatingCache($review->game_id);
+
+            return true;
+        });
     }
 
     /**
@@ -88,21 +108,30 @@ class ReviewService extends BaseService
      */
     public function rejectReview(int $reviewId): bool
     {
-        $review = Review::findOne($reviewId);
+        $db = Review::getDb();
 
-        if (!$review) {
-            throw new \Exception(\Yii::t('app', 'Review not found.'));
-        }
+        return $db->transaction(function ($db) use ($reviewId) {
+            $review = Review::findOne($reviewId);
 
-        if (!$review->delete()) {
-            throw new \Exception(\Yii::t('app', 'Failed to reject review.'));
-        }
+            if (!$review) {
+                throw new \Exception(\Yii::t('app', 'Review not found.'));
+            }
 
-        Event::trigger(Review::class, Review::EVENT_REJECTED, new Event([
-            'sender' => $review,
-        ]));
+            $gameId = $review->game_id;
 
-        return true;
+            if (!$review->delete()) {
+                throw new \Exception(\Yii::t('app', 'Failed to reject review.'));
+            }
+
+            Event::trigger(Review::class, Review::EVENT_REJECTED, new Event([
+                'sender' => $review,
+            ]));
+            $this->refreshStats();
+
+            $this->deleteRatingCache($gameId);
+
+            return true;
+        });
     }
 
     /**
@@ -110,7 +139,7 @@ class ReviewService extends BaseService
      */
     public function getAverageRating(int $gameId): float
     {
-        $key = "game:{$gameId}:rating";
+        $key = $this->getRatingCacheKey($gameId);
 
         return \Yii::$app->cache->getOrSet($key, function () use ($gameId) {
             return Review::find()
@@ -129,5 +158,25 @@ class ReviewService extends BaseService
             ->where(['game_id' => $gameId, 'is_approved' => true])
             ->count()
         ;
+    }
+
+    /**
+     * Сбрасывает кэш рейтинга игры
+     * @param int $gameId
+     * @return void
+     */
+    private function deleteRatingCache(int $gameId): void
+    {
+
+        \Yii::$app->cache->delete($this->getRatingCacheKey($gameId));
+    }
+
+    /**
+     * @param int $gameId
+     * @return string
+     */
+    private function getRatingCacheKey(int $gameId): string
+    {
+        return str_replace('%d', $gameId, self::RATING_CACHE_KEY_PATTERN);
     }
 }

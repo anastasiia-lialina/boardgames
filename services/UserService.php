@@ -36,34 +36,42 @@ class UserService extends BaseService
      */
     public function createUser(Form $form, string $role = User::ROLE_USER): User
     {
-        $user = new User();
-        $this->load($user, $form);
-        $user->setPassword($form->password ?? '');
-        $user->generateAuthKey();
+        $db = User::getDb();
 
-        if (!$user->save()) {
-            throw new ServiceException($user);
-        }
+        return $db->transaction(function ($db) use ($form, $role) {
+            $user = new User();
+            $this->load($user, $form);
+            $user->setPassword($form->password ?? '');
+            $user->generateAuthKey();
 
-        $this->assignRole($user->id, $role);
+            if (!$user->save()) {
+                throw new ServiceException($user);
+            }
 
-        return $user;
+            $this->assignRole($user->id, $role);
+
+            return $user;
+        });
     }
 
     public function updateUser(int $id, Form $form): User
     {
-        $user = $this->findUser($id);
+        $db = User::getDb();
 
-        $this->load($user, $form);
-        if (!empty($form->getSafeAttributes()['password'])) {
-            $user->setPassword($form->getSafeAttributes()['password']);
-        }
+        return $db->transaction(function ($db) use ($id, $form) {
+            $user = $this->findUser($id);
 
-        if (!$user->save()) {
-            throw new ServiceException($user);
-        }
+            $this->load($user, $form);
+            if (!empty($form->getSafeAttributes()['password'])) {
+                $user->setPassword($form->getSafeAttributes()['password']);
+            }
 
-        return $user;
+            if (!$user->save()) {
+                throw new ServiceException($user);
+            }
+
+            return $user;
+        });
     }
 
     public function deactivateUser(int $id): bool
@@ -87,15 +95,19 @@ class UserService extends BaseService
      */
     public function assignRole(int $userId, string $roleName): void
     {
-        $auth = \Yii::$app->authManager;
-        $role = $auth->getRole($roleName);
+        $db = \Yii::$app->authManager->db;
 
-        if (!$role) {
-            throw new \Exception("Роль '{$roleName}' не найдена в системе.");
-        }
+        $db->transaction(function ($db) use ($userId, $roleName) {
+            $auth = \Yii::$app->authManager;
+            $role = $auth->getRole($roleName);
 
-        $auth->revokeAll($userId);
-        $auth->assign($role, $userId);
+            if (!$role) {
+                throw new \Exception("Роль '{$roleName}' не найдена в системе.");
+            }
+
+            $auth->revokeAll($userId);
+            $auth->assign($role, $userId);
+        });
     }
 
     public function login(User $user, bool $rememberMe = false): bool

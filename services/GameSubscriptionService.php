@@ -52,69 +52,93 @@ class GameSubscriptionService extends BaseService
      */
     public function subscribe(int $userId, int $gameId): bool
     {
-        $existing = $this->findSubscription($userId, $gameId);
+        $db = GameSubscription::getDb();
 
-        if ($existing) {
-            if ($existing->is_active) {
-                return true; // Уже подписан
+        return $db->transaction(function ($db) use ($userId, $gameId) {
+            $existing = $this->findSubscription($userId, $gameId);
+
+            if ($existing) {
+                if ($existing->is_active) {
+                    return true; // Уже подписан
+                }
+
+                $existing->is_active = GameSubscription::STATUS_ACTIVE;
+
+                return $existing->save(false, ['is_active']);
             }
 
-            $existing->is_active = GameSubscription::STATUS_ACTIVE;
+            $subscription = new GameSubscription();
+            $subscription->user_id = $userId;
+            $subscription->game_id = $gameId;
+            $subscription->is_active = GameSubscription::STATUS_ACTIVE;
 
-            return $existing->save(false, ['is_active']);
-        }
+            if (!$subscription->save()) {
+                throw new ServiceException($subscription);
+            }
 
-        $subscription = new GameSubscription();
-        $subscription->user_id = $userId;
-        $subscription->game_id = $gameId;
-        $subscription->is_active = GameSubscription::STATUS_ACTIVE;
+            $this->refreshStats();
 
-        if (!$subscription->save()) {
-            throw new ServiceException($subscription);
-        }
-
-        return true;
+            return true;
+        });
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @param int $userId
+     * @param int $gameId
+     * @return bool
+     * @throws \Throwable
      */
     public function unsubscribe(int $userId, int $gameId): bool
     {
-        $subscription = $this->findSubscription($userId, $gameId);
+        $db = GameSubscription::getDb();
 
-        if (!$subscription || !$subscription->is_active) {
-            return true; // Уже не подписан
-        }
+        return $db->transaction(function ($db) use ($userId, $gameId) {
+            $subscription = $this->findSubscription($userId, $gameId);
 
-        $subscription->is_active = GameSubscription::STATUS_INACTIVE;
+            if (!$subscription || !$subscription->is_active) {
+                return true; // Уже не подписан
+            }
 
-        return $subscription->save(false, ['is_active']);
+            $subscription->is_active = GameSubscription::STATUS_INACTIVE;
+
+            if (!$subscription->save(false, ['is_active'])) {
+                throw new ServiceException($subscription);
+            }
+            $this->refreshStats();
+
+            return true;
+        });
     }
 
     /**
      * Переключение статуса подписки.
      *
+     * @param int $id
      * @return bool Успешность операции
      *
-     * @throws \yii\db\Exception
-     * @throws Exception
+     * @throws \Throwable
      */
     public function toggleSubscription(int $id): bool
     {
-        $subscription = GameSubscription::findOne($id);
+        $db = GameSubscription::getDb();
 
-        if ($subscription) {
-            $subscription->is_active = !$subscription->is_active;
+        return $db->transaction(function ($db) use ($id) {
+            $subscription = GameSubscription::findOne($id);
 
-            if (!$subscription->save(false, ['is_active'])) {
-                throw new ServiceException($subscription);
+            if ($subscription) {
+                $subscription->is_active = !$subscription->is_active;
+
+                if (!$subscription->save(false, ['is_active'])) {
+                    throw new ServiceException($subscription);
+                }
+
+                $this->refreshStats();
+
+                return true;
             }
 
-            return true;
-        }
-
-        throw new Exception('The requested subscription does not exist.');
+            throw new Exception('The requested subscription does not exist.');
+        });
     }
 
     /**
@@ -125,43 +149,11 @@ class GameSubscriptionService extends BaseService
     {
         $subscription = $this->findSubscriptionById($id);
 
-        return false !== $subscription->delete();
-    }
+        if (!$subscription->delete()) {
+            return false;
+        }
 
-    public function getUserSubscriptions(int $userId): array
-    {
-        return GameSubscription::find()
-            ->with(['game'])
-            ->where(['user_id' => $userId, 'is_active' => GameSubscription::STATUS_ACTIVE])
-            ->all()
-        ;
-    }
-
-    public function getGameSubscribers(int $gameId): array
-    {
-        return GameSubscription::find()
-            ->with(['user'])
-            ->where(['game_id' => $gameId, 'is_active' => GameSubscription::STATUS_ACTIVE])
-            ->all()
-        ;
-    }
-
-    public function getSubscriptionStats(int $gameId): array
-    {
-        $total = GameSubscription::find()
-            ->where(['game_id' => $gameId])
-            ->count()
-        ;
-
-        $active = GameSubscription::find()
-            ->where(['game_id' => $gameId, 'is_active' => GameSubscription::STATUS_ACTIVE])
-            ->count()
-        ;
-
-        return [
-            'total_subscriptions' => $total,
-            'active_subscriptions' => $active,
-            'inactive_subscriptions' => $total - $active,
-        ];
+        $this->refreshStats();
+        return true;
     }
 }

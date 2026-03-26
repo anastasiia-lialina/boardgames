@@ -5,7 +5,9 @@ namespace app\services;
 use app\exception\ServiceException;
 use app\models\forms\Form;
 use app\models\game\Game;
+use app\models\game\GameSession;
 use app\models\search\GameSearch;
+use yii\base\Event;
 use yii\data\ActiveDataProvider;
 
 class GameService extends BaseService
@@ -31,6 +33,8 @@ class GameService extends BaseService
             throw new ServiceException($game);
         }
 
+        $this->refreshStats();
+
         return $game;
     }
 
@@ -51,13 +55,34 @@ class GameService extends BaseService
     }
 
     /**
-     * @throws \Exception
+     * @param int $id
+     * @return bool
+     * @throws \Throwable
      */
     public function deleteGame(int $id): bool
     {
-        $game = $this->findModel(Game::class, $id);
+        $db = Game::getDb();
 
-        return false !== $game->delete();
+        return $db->transaction(callback: function ($db) use ($id) {
+            $game = $this->findModel(Game::class, $id);
+
+            // Проверяем связанные сессии перед удалением
+            $sessionCount = GameSession::find()
+                ->where(['game_id' => $id])
+                ->count();
+
+            if ($sessionCount > 0) {
+                throw new \Exception('Нельзя удалить игру с существующими сессиями');
+            }
+
+            if (!$game->delete()) {
+                return false;
+            }
+
+            $this->refreshStats();
+
+            return true;
+        });
     }
 
     public function getGameWithSessions(int $id): Game
@@ -66,17 +91,6 @@ class GameService extends BaseService
             ->with(['sessions', 'reviews'])
             ->where(['id' => $id])
             ->one()
-        ;
-    }
-
-    public function getPopularGames(int $limit = 10): array
-    {
-        return Game::find()
-            ->joinWith(['sessions'])
-            ->groupBy('{{%games}}.id')
-            ->orderBy(['COUNT({{%game_sessions}}.id)' => SORT_DESC])
-            ->limit($limit)
-            ->all()
         ;
     }
 }

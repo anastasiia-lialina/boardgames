@@ -25,6 +25,8 @@ class Review extends ActiveRecord
     public const MIN_RATING = 1;
     public const MAX_RATING = 5;
     public const MAX_COMMENT_LENGTH = 1000;
+    public const STATUS_APPROVED = 1;
+    public const STATUS_PENDING = 0;
 
     public const EVENT_MODERATION_NEEDED = 'moderationNeeded';
     public const EVENT_APPROVED = 'approved';

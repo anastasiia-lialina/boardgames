@@ -32,6 +32,7 @@ class GameSessionService extends BaseService
 
         if ($session->save()) {
             Event::trigger(GameSession::class, GameSession::EVENT_SESSION_CREATED, new Event(['sender' => $session]));
+            $this->refreshStats();
         }
 
         return $session;
@@ -58,6 +59,7 @@ class GameSessionService extends BaseService
         if ($session->save()) {
             if ($oldStatus !== $session->status) {
                 Event::trigger(GameSession::class, GameSession::EVENT_STATUS_CHANGED, new Event(['sender' => $session]));
+                $this->refreshStats();
             }
         }
 
@@ -77,7 +79,13 @@ class GameSessionService extends BaseService
     {
         $session = $this->findModel(GameSession::class, $sessionId);
 
-        return $session->delete();
+        if (!$session->delete()) {
+            return false;
+        }
+
+        $this->refreshStats();
+
+        return true;
     }
 
     /**
@@ -106,6 +114,7 @@ class GameSessionService extends BaseService
         }
 
         Event::trigger(GameSession::class, GameSession::EVENT_STATUS_CHANGED, new Event(['sender' => $session]));
+        $this->refreshStats();
 
         return true;
     }
@@ -221,7 +230,7 @@ class GameSessionService extends BaseService
                 return 0;
             }
 
-            $logRows = array_map(fn ($id) => [
+            $logRows = array_map(fn($id) => [
                 (int) $id,
                 GameSession::STATUS_PLANNED,
                 GameSession::STATUS_CANCELLED,

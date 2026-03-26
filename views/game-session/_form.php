@@ -49,7 +49,7 @@ use yii\helpers\Html;
         'max' => 20,
     ]) ?>
     <?php if (!$model->isNewRecord):?>
-        <?= $form->field($model, 'status')->dropDownList($model->getStatusLabels()) ?>
+        <?= $form->field($model, 'status')->dropDownList($model::getStatusLabels()) ?>
     <?php endif;?>
 
     <div class="form-group mt-3">

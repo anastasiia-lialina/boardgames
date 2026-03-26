@@ -103,10 +103,10 @@ class GameSession extends ActiveRecord
      */
     public function getStatusLabel()
     {
-        return ArrayHelper::getValue($this->getStatusLabels(), $this->status, \Yii::t('app', 'Planned'));
+        return ArrayHelper::getValue(self::getStatusLabels(), $this->status, \Yii::t('app', 'Planned'));
     }
 
-    public function getStatusLabels(): array
+    public static function getStatusLabels(): array
     {
         return [
             self::STATUS_PLANNED => \Yii::t('app', 'Planned'),

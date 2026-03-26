@@ -56,7 +56,7 @@ $this->title = Yii::t('app', 'Game Sessions');
 
                         return "<span class=\"badge {$color}\">" . Html::encode($model->statusLabel) . '</span>';
                     },
-                    'filter' => $searchModel->getStatusLabels(),
+                    'filter' => $searchModel::getStatusLabels(),
                 ],
                 [
                     'class' => 'yii\grid\ActionColumn',

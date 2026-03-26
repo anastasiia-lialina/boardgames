@@ -85,6 +85,7 @@ class GameSubscriptionController extends Controller
      */
     public function actionSubscribe(): Response
     {
+        //TODO объединить этот экшен и экшен отписки
         $form = new GameSubscriptionForm();
         $form->user_id = \Yii::$app->user->id;
         $form->game_id = $this->request->post('gameId');

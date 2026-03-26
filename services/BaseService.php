@@ -3,6 +3,7 @@
 namespace app\services;
 
 use app\models\forms\Form;
+use yii\base\Event;
 use yii\base\Model;
 
 abstract class BaseService
@@ -31,5 +32,10 @@ abstract class BaseService
                 $model->{$attribute} = $value;
             }
         }
+    }
+
+    protected function refreshStats()
+    {
+        Event::trigger(ReportService::class, ReportService::EVENT_REFRESH_STATS, new Event());
     }
 }
