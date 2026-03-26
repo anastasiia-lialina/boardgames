@@ -5,6 +5,7 @@ namespace app\services;
 use app\models\forms\Form;
 use yii\base\Event;
 use yii\base\Model;
+use yii\web\NotFoundHttpException;
 
 abstract class BaseService
 {
@@ -17,7 +18,7 @@ abstract class BaseService
         $model = $modelClass::findOne($id);
 
         if (null === $model) {
-            throw new \Exception('Model not found');
+            throw new NotFoundHttpException('Model not found');
         }
 
         return $model;

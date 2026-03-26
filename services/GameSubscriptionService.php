@@ -47,8 +47,10 @@ class GameSubscriptionService extends BaseService
     }
 
     /**
-     * @throws ServiceException
-     * @throws \yii\db\Exception
+     * @param int $userId
+     * @param int $gameId
+     * @return bool
+     * @throws \Throwable
      */
     public function subscribe(int $userId, int $gameId): bool
     {
@@ -120,25 +122,17 @@ class GameSubscriptionService extends BaseService
      */
     public function toggleSubscription(int $id): bool
     {
-        $db = GameSubscription::getDb();
+        $subscription = $this->findModel(GameSubscription::class, $id);
 
-        return $db->transaction(function ($db) use ($id) {
-            $subscription = GameSubscription::findOne($id);
+        $subscription->is_active = !$subscription->is_active;
 
-            if ($subscription) {
-                $subscription->is_active = !$subscription->is_active;
+        if (!$subscription->save(false, ['is_active'])) {
+            throw new ServiceException($subscription);
+        }
 
-                if (!$subscription->save(false, ['is_active'])) {
-                    throw new ServiceException($subscription);
-                }
+        $this->refreshStats();
 
-                $this->refreshStats();
-
-                return true;
-            }
-
-            throw new Exception('The requested subscription does not exist.');
-        });
+        return true;
     }
 
     /**
